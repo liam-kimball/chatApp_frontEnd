@@ -1,102 +1,48 @@
-// Chat Window App
-let chatapp = new Vue({
-    el: "#chatWindow",
-    data: {
-        title: 'Name of current channel',
-    
-        lists: [
-            //{ id:1, item:'play games',},
-            //{ id:2, item:'learn more'},
-            //{ id:3, item:'take nap'}
-        ],
-        newItem:'',
+var STORAGE_KEY = 'chatApp-chat-12345'
+var chatStorage = {
+    fetch: function () {
+        var chats = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        return chats;
+        //parse is the opposite of stringify
     },
+    save: function (chats) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
+    }
+}
+
+
+let app = new Vue({
+    el: "#chatApp",
+    data: {
+        welcomeMessage: 'Chat App',
+        chats: chatStorage.fetch(),
+        addChatMessage: '',
+    },
+
+    watch: {
+        chats: {
+            handler: function(chats) {
+                chatStorage.save(chats);
+            }
+        }
+    },
+
     methods: {
-        addItem:function(){
-            //generate id
-            let id = this.lists.length + 1
-            if(this.newItem !== ''){
-                // create new list instance
-                const newList = {id:id, item:this.newItem, completed:false}
-                // add it to array
-                this.lists.push(newList)
-                // turn the new item to an empty string
-                this.newItem = ''
-                // save the new list
-                this.saveLists();
+        addChat(event){
+            const text = event.target.value
+            this.chats.push({text, done: false, id: Date.now()})
+            // event.target.value = ''
+            this.addChatMessage = ''
+        },
 
-            }
+        removeChat(id) {
+            this.chats = this.chats.filter(chat => chat.id !== id)
         },
-        removeList:function(id){
-            Vue.delete(this.lists, id);
-            this.saveLists();
-        },
-        saveLists:function(){
-            const parsed = JSON.stringify(this.lists);
-            localStorage.setItem('lists', parsed);
-        },
-        toggleCompleted:function(list){
-            list.completed = !list.completed;
-            this.saveLists();
-        }
+
+
+
     },
     mounted() {
-        if (localStorage.getItem('lists')) {
-            try {
-              this.lists = JSON.parse(localStorage.getItem('lists'));
-            } catch(e) {
-              localStorage.removeItem('lists');
-            }
-          }
-    },
-});
 
-
-let workspace = new Vue({
-    el: "#workspace",
-    data: {
-        lists: [
-            { id:1, item:'Workspace 1',},
-            { id:2, item:'Workspace 2'},
-            { id:3, item:'Workspace 3'}
-        ],
-        newItem: '',
-    },
-methods: {
-        addItem:function(){
-            //generate id
-            let id = this.lists.length + 1
-            if(this.newItem !== ''){
-                // create new list instance
-                const newList = {id:id, item:this.newItem, completed:false}
-                // add it to array
-                this.lists.push(newList)
-                // turn the new item to an empty string
-                this.newItem = ''
-                // save the new list
-                this.saveLists();
-            }
-        },
-        removeList:function(id){
-            Vue.delete(this.lists, id);
-            this.saveLists();
-        },
-        saveLists:function(){
-            const parsed = JSON.stringify(this.lists);
-            localStorage.setItem('lists', parsed);
-        },
-        toggleCompleted:function(list){
-            list.completed = !list.completed;
-            this.saveLists();
-        }
-    },
-    mounted() {
-        if (localStorage.getItem('lists')) {
-            try {
-              this.lists = JSON.parse(localStorage.getItem('lists'));
-            } catch(e) {
-              localStorage.removeItem('lists');
-            }
-          }
     },
 });

@@ -4,97 +4,70 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <link rel="stylesheet" href="css/main.css">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-        <script src="https://kit.fontawesome.com/2bfbfdcf12.js" crossorigin="anonymous"></script>
-        <title>HydraCor Chat App</title>
+        <link rel="stylesheet" href="css/mains.css">
+        <title>Chat App</title>
     </head>
     <body>
-        
-        <div class="container">
-            <div class="row">
-                <div id="workspace" class="col-lg-4">
-                   <nav id="workspace-container" class="navbar navbar-default"></nav> 
-                    <h4><span><i class="fas fa-server"></i></span> Workspaces</h4>
-                    
-                    <ul class="workspace-nav nav navbar-nav" v-for="(list, id) in lists" v-bind:key="list.id">
-                            
-                        <li class="item" v-bind:class="[{ 'checked': list.completed }]">
-                            <a href="#">                                
-                                <span><i class="fas fa-hdd"></i></span> {{list.item}}
-                            </a>
-                            <div class="text-top"><button class="btn btn-outline-danger" v-on:click="removeList(id)"><span><i class="fas fa-trash-alt"></i></span></button></div>
-                        </li>
-                    </ul>
-                    
 
-                    <input v-model="newItem" v-on:keyup.enter='addItem'/>
-                    <span><button class="btn btn-success" @click.prevent="addItem">Add</button></span><br>
-                    <small>adding item...{{newItem}}</small><br>
-                        <!--
-                        <div class="container-fluid">
-                            <ul class="workspace-nav nav navbar-nav">
-                                
-                                <li class="active"><a href="#">Workspace 1<span><i class="fas fa-hdd"></i></span></a></li>
-                                <li><a href="#">Workspace 2<span><i class="fas fa-hdd"></i></span></a></li>
-                                <li><a href="#">Workspace 3<span><i class="fas fa-hdd"></i></span></a></li>
-                                <li><a href="#">Workspace 4<span><i class="fas fa-hdd"></i></span></a></li>
-                                <li><a href="#">Add Workspace<span><i class="fas fa-plus"></i></span></a></li>
-                            </ul>
-                        </div> 
-                        -->
-                    </nav>
-                </div>
-                <!--
-                <div id="nav" class="col">
-                    <nav id="channel-container" class="navbar navbar-default">
-                        <div class="container-fluid">
-                            <ul class="channel-nav nav navbar-nav">
-                                <h4><span><i class="fas fa-project-diagram"></i></span> Channels</h4>
-                                <li class="active"><a href="#"><span><i class="fas fa-hashtag"></i></span> Channel 1</a></li>
-                                <li><a href="#"><span><i class="fas fa-hashtag"></i></span> Channel 2</a></li>
-                                <li><a href="#"><span><i class="fas fa-hashtag"></i></span> Channel 3</a></li>
-                                <li><a href="#"><span><i class="fas fa-hashtag"></i></span> Channel 4</a></li>
-                                <li><a href="#"><span><i class="fas fa-plus"></i></span> Add Channel</a></li>
-                            </ul>
-                        </div>
-                    </nav>
-                -->
+        <!-- https://dev.to/hugoliconv/lets-build-a-todo-app-using-vuejs-52in -->
 
-                    <!-- Select server or join/create new server -->
-                
-                    <!-- Select channel or join/create new channel -->
-                    
-                    <!-- List of users in current workspace -->
+        <div id="chatApp">
 
-                
-                <div id="channel" class="col">
-                    <nav id="channel-container" class="navbar navbar-default">
-                        <div class="container-fluid">
-                            <ul class="channel-nav nav navbar-nav">
-                                <h4><span><i class="fas fa-project-diagram"></i></span> Channels</h4>
-                                <li class="active"><a href="#"><span><i class="fas fa-hashtag"></i></span> Channel 1</a></li>
-                                <li><a href="#"><span><i class="fas fa-hashtag"></i></span> Channel 2</a></li>
-                                <li><a href="#"><span><i class="fas fa-hashtag"></i></span> Channel 3</a></li>
-                                <li><a href="#"><span><i class="fas fa-hashtag"></i></span> Channel 4</a></li>
-                                <li><a href="#"><span><i class="fas fa-plus"></i></span> Add Channel</a></li>
-                            </ul>
-                        </div>
-                    </nav>
-                </div>
-                <div id="chat" class="col">
-                    <!-- Chat within current channel/dm -->
-
-                    <!-- Type a new message -->
-
-                </div>
-            
+            <div class="nav-bar">
+                <h1 class="welcome">{{welcomeMessage}}</h1>
             </div>
-                              
+
+            <div class="sidebar">
+                <a class="active" href="index.html">Home</a>
+                <a href="channels.html">Channel</a>
+                <a href="users.html">Users</a>
+                <a href="dms.html">Direct Messages</a>
+              </div>
+
+            <div id="id01" class="modal">
+                
+                <form class="modal-content animate"  method="post">
+
+                    <div class="container">
+                    <label for="uname"><b>Username</b></label>
+                    <input type="text" placeholder="Enter Username" name="uname" required>
+                    &nbsp
+                    <label for="psw"><b>Password</b></label>
+                    <input type="password" placeholder="Enter Password" name="psw" required>
+                    &nbsp
+                    <button type="submit">Login</button> 
+                    &nbsp 
+                    <label>
+                        <input type="checkbox" checked="checked" name="remember"> Remember me
+                    </label>
+                        <span class="psw"> <a href="#"> Forgot password?</a></span>
+                    </div>
+                    
+                </form>
+
+                <form class="modal-content animate" method="post">
+                    <div class="container">
+                      
+                      <label for="email"><b>Email</b></label>
+                      <input type="text" placeholder="Enter Email" name="email" required>
+                      &nbsp
+                      <label for="psw"><b>Password</b></label>
+                      <input type="password" placeholder="Enter Password" name="psw" required>
+                      &nbsp
+                      <label for="psw-repeat"><b>Repeat Password</b></label>
+                      <input type="password" placeholder="Repeat Password" name="psw-repeat" required>
+                      &nbsp 
+                      <button type="submit" class="signupbtn">Sign Up</button>
+                    </div>
+                  </form>
+
+            </div>
+            
         </div>
-        <script src="js/vue.min.js"></script>
+
+        
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js"></script>
         <script src="js/main.js"></script>
     </body>
 </html>
