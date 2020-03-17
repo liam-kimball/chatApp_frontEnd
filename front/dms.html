@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="css/mains.css">
+        <title>Chat App</title>
+    </head>
+    <body>
+
+        <!-- https://dev.to/hugoliconv/lets-build-a-todo-app-using-vuejs-52in -->
+
+        <div id="chatApp">
+
+            <div class="nav-bar">
+                <h1 class="welcome">{{welcomeMessage}}</h1>
+            </div>
+
+            <div class="sidebar">
+                <a  href="index.html">Home</a>
+                <a href="channels.html">Channel</a>
+                <a href="users.html">Users</a>
+                <a class="active" href="dms.html">Direct Messages</a>
+              </div>
+            
+              <input type="text" class="welcome" placeholder="Message" v-on:keyup.enter="addChat" v-model="addChatMessage">
+
+            <ul>
+                <li v-for="chat in chats" class="flex">
+                    
+                    <span> {{chat.text}} </span>
+                    <div class="space"></div>
+                    <button class="xbutton" v-on:click="removeChat(chat.id)">X</button>
+                </li>
+
+            </ul>
+            
+            </div>
+        
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js"></script>
+        <script src="js/main.js"></script>
+    </body>
+</html>

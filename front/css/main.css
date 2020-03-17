@@ -1,0 +1,229 @@
+h1.welcome {
+    text-align: center;
+    padding: 10px;
+    color: red;
+    height: 100%;
+  
+  }
+  input.welcome {
+    margin-left: auto;
+    margin-right: auto;
+    width: 200px;
+    display: block;
+    padding: 10px;
+    font-size: 24px;
+    text-align: center;
+    border-radius: 5px;
+  }
+  
+  .nav-bar {
+    background: linear-gradient(-90deg, rgb(0, 0, 0), rgb(125, 141, 139));
+    height: 60px;
+    margin-bottom: 30px;
+    font-family: monospace;
+    /* margin-bottom: 10px; */
+    /* padding-bottom: 10px; */
+    /* border: solid;
+    border-color: black;
+    border-radius: 3px; */
+  }
+  
+  /* body {
+    background: rgb(218, 218, 218);
+    padding: 40px;
+  } */
+  
+  #chatApp {
+    background: #fff;
+    border-radius: 3px;
+    padding: 20px;
+    transition: all 0.2s;
+  }
+  
+  li {
+    margin: 10px 0;
+    font-family: monospace;
+    font-size: 16pt;
+    background-color: slategray;
+    padding: 20px;
+    border: solid;
+    border-color: black;
+    border-radius: 3px;
+  }
+  
+  del {
+    color: rgba(0, 0, 0, 0.3);
+  }
+  
+  .xbutton {
+    font-size: 20px;
+    background-color: tomato;
+    color: black;
+    padding: 5px;
+    border-radius: 5px;
+  }
+  
+  .padding {
+      padding: 1px 7px 2px;
+    }
+  
+    
+  .flex {
+    display: flex;
+    float: right;
+    width: 70%;
+  }
+  
+  .date{
+    float: left;
+    font-size: 12px;
+  }
+  
+  /* nav bar */
+  
+  .space {
+      flex-grow: 2;
+    }
+  
+    .sidebar {
+        margin: 0;
+        padding: 0;
+        width: 200px;
+        background-color: #f1f1f1;
+        position: fixed;
+        height: 100%;
+        overflow: auto;
+        float: left;
+        
+      }
+      
+      .sidebar a {
+        display: block;
+        color: black;
+        padding: 16px;
+        text-decoration: none;
+      }
+       
+      .sidebar a.active {
+        background-color: #4CAF50;
+        color: white;
+      }
+      
+      .sidebar a:hover:not(.active) {
+        background-color: #555;
+        color: white;
+      }
+      
+      div.content {
+        margin-left: 200px;
+        padding: 1px 16px;
+        height: 1000px;
+      }
+      
+      @media screen and (max-width: 700px) {
+        .sidebar {
+          width: 100%;
+          height: auto;
+          position: relative;
+        }
+        .sidebar a {float: left;}
+        div.content {margin-left: 0;}
+      }
+      
+      @media screen and (max-width: 400px) {
+        .sidebar a {
+          text-align: center;
+          float: none;
+        }
+      }
+  
+  /*  chat */
+  
+      body {
+        background: rgb(218, 218, 218);
+        margin: 0 auto;
+        max-width: 800px;
+        padding: 0 20px;
+        height: auto;
+  
+      }
+      
+      .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+      }
+      
+      .darker {
+        border-color: #ccc;
+        background-color: #ddd;
+      }
+      
+      .container::after {
+        content: "";
+        clear: both;
+        display: table;
+      }
+      
+      .container img {
+        float: left;
+        max-width: 60px;
+        width: 100%;
+        margin-right: 20px;
+        border-radius: 50%;
+      }
+      
+      .container img.right {
+        float: right;
+        margin-left: 20px;
+        margin-right:0;
+      }
+      
+      .time-right {
+        float: right;
+        color: #aaa;
+      }
+      
+      .time-left {
+        float: left;
+        color: #999;
+      }
+  
+  /* .sidenav {
+    height: 100%;
+    width: 160px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    padding-top: 20px;
+    }
+    
+  .sidenav a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    }
+    
+  .sidenav a:hover {
+    color: #f1f1f1;
+    }
+  
+  .main {
+    margin-left: 160px; /* Same as the width of the sidenav */
+    /* font-size: 28px; Increased text to enable scrolling */
+    /* padding: 0px 10px;
+    }
+    
+  @media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+    } */
+  
+    /*  */
