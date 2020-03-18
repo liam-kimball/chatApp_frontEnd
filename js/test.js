@@ -1,78 +1,4 @@
 
-let workspaces = new Vue({
-    el: "#workspace",
-    data: {
-        title: 'Name of current workspaces',
-        editWorkspace: null,
-        workspaces: [],
-        newWorkspace: '',
-    },
-    methods: {
-        deleteWorkspace(id, i) {
-            fetch("http://rest.learncode.academy/api/lkimball/workspace/" + id, {
-                method: "DELETE"
-            })
-            .then(() => {
-                this.workspaces.splice(i,1);
-            })
-        },
-        updateWorkspace(workspace) {
-            fetch("http://rest.learncode.academy/api/lkimball/workspace/" + workspace.id, {
-                body: JSON.stringify(workspace),
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-            .then(() => {
-                this.editWorkspace = null;
-            })
-        },
-        addWorkspace(name){
-            fetch("http://rest.learncode.academy/api/lkimball/workspace/", {
-                body: JSON.stringify({"name": name}),
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-            .then(response => response.json())
-            .then((data) => {
-                this.workspaces.push(data);
-            })             
-        }
-    },
-    mounted() {
-        fetch("http://rest.learncode.academy/api/lkimball/workspace")
-        .then(response => response.json())
-        .then((data) => {
-            this.workspaces = data;
-        })
-    },
-    template: `
-        <div>
-            <h4> Workspaces: </h4>
-            <li v-for="workspace, i in workspaces">
-                <div v-if="editWorkspace === workspace.id">
-                    <input v-on:keyup.enter="updateWorkspace(workspace)" v-model="workspace.name" />
-                    <button v-on:click="updateWorkspace(workspace)">save</button>
-                
-                </div>
-                <div v-else>
-                    <button v-on:click="editWorkspace = workspace.id">edit</button>
-                    <button v-on:click="deleteWorkspace(workspace.id, i)">X</button>
-                    <h4>{{workspace.name}}</h4>
-                    <h5>id: {{workspace.id}}</h5>
-                </div>
-            </li>
-            <br><br>
-            <h5>Create a new workspace:</h5>
-            <input v-model="newWorkspace" v-on:keyup.enter='addWorkspace(newWorkspace)'/>
-            <button v-on:click="addWorkspace(newWorkspace)">Add</button>
-            <small>adding item...{{newWorkspace}}</small>
-        </div>
-    `
-});
 
 let login = new Vue({
     el: "#login",
@@ -190,5 +116,82 @@ let singUp = new Vue({
             <br><br>
         </div>
     
+    `
+});
+
+let workspaces = new Vue({
+    el: "#workspace",
+    data: {
+        title: 'Name of current workspaces',
+        editWorkspace: null,
+        workspaces: [],
+        newWorkspace: '',
+    },
+    methods: {
+        deleteWorkspace(id, i) {
+            fetch("http://rest.learncode.academy/api/lkimball/workspace/" + id, {
+                method: "DELETE"
+            })
+            .then(() => {
+                this.workspaces.splice(i,1);
+            })
+        },
+        updateWorkspace(workspace) {
+            fetch("http://rest.learncode.academy/api/lkimball/workspace/" + workspace.id, {
+                body: JSON.stringify(workspace),
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            .then(() => {
+                this.editWorkspace = null;
+            })
+        },
+        addWorkspace(name){
+            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/add.json", {
+                body: JSON.stringify({"name": name}),
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem('token')
+                },
+            })
+            .then(response => response.json())
+            .then((data) => {
+                console.log(data);
+                this.workspaces.push(data);
+            })             
+        }
+    },
+    mounted() {
+        fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces.json")
+        .then(response => response.json())
+        .then((data) => {
+            this.workspaces = data;
+        })
+    },
+    template: `
+        <div>
+            <h4> Workspaces: </h4>
+            <li v-for="workspace, i in workspaces">
+                <div v-if="editWorkspace === workspace.id">
+                    <input v-on:keyup.enter="updateWorkspace(workspace)" v-model="workspace.name" />
+                    <button v-on:click="updateWorkspace(workspace)">save</button>
+                
+                </div>
+                <div v-else>
+                    <button v-on:click="editWorkspace = workspace.id">edit</button>
+                    <button v-on:click="deleteWorkspace(workspace.id, i)">X</button>
+                    <h4>{{workspace.name}}</h4>
+                    <h5>id: {{workspace.id}}</h5>
+                </div>
+            </li>
+            <br><br>
+            <h5>Create a new workspace:</h5>
+            <input v-model="newWorkspace" v-on:keyup.enter='addWorkspace(newWorkspace)'/>
+            <button v-on:click="addWorkspace(newWorkspace)">Add</button>
+            <small>adding item...{{newWorkspace}}</small>
+        </div>
     `
 });
