@@ -131,10 +131,11 @@ let workspaces = new Vue({
         editWorkspace: null,
         workspaces: [],
         newWorkspace: '',
+        current_workspace: null,
     },
     methods: {
         deleteWorkspace(id, i) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + workspace.id, {
+            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + id + ".json", {
                 method: "DELETE",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem('token')
@@ -171,6 +172,9 @@ let workspaces = new Vue({
                 console.log(data);
                 //this.workspaces.push(data.Work_Space);
             })             
+        },
+        saveCurrentWorkspace(){
+            localStorage.setItem('current_workspace', this.current_workspace);
         }
     },
     mounted() {
@@ -188,6 +192,7 @@ let workspaces = new Vue({
         <div class="container bg-dark p-3 my-3 border">
             <h4> Workspaces: </h4>
             <li v-for="workspace, i in workspaces">
+                <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace()">
                 <div class="container p-3 my-3 border">
                     <div v-if="editWorkspace === workspace.id">
                         <input v-on:keyup.enter="updateWorkspace(workspace)" v-model="workspace.name" />
@@ -203,6 +208,7 @@ let workspaces = new Vue({
                     </div>
                 </div>
             </li>
+            <span>Selected: {{ current_workspace }}</span>
             <h5>Create a new workspace:</h5>
             <input v-model="newWorkspace" v-on:keyup.enter='addWorkspace(newWorkspace)'/>
             <button v-on:click="addWorkspace(newWorkspace)">Add</button>
@@ -243,7 +249,10 @@ let threads = new Vue({
         },
         addThread(name){
             fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/add.json", {
-                body: JSON.stringify({"name": name}),
+                body: JSON.stringify({
+                    "name": name,
+                    "workspace_id": localStorage.getItem('current_workspace'),
+                }),
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -265,7 +274,15 @@ let threads = new Vue({
         .then(response => response.json())
         .then((data) => {
             console.log(data.Threads);
-            this.threads = data.Threads;
+            var filtered = (data.Threads).filter(function (entry) {
+                //console.log(entry);
+                //console.log("entry " + entry.workspace_id);
+                //console.log("storage " + localStorage.getItem('current_workspace'));
+                //console.log(JSON.stringify(entry.workspace_id) === localStorage.getItem('current_workspace'));
+                return JSON.stringify(entry.workspace_id) === localStorage.getItem('current_workspace');
+            });
+            console.log(filtered);
+            this.threads = filtered;
         })
     },
     template: `
@@ -283,6 +300,7 @@ let threads = new Vue({
                         <button v-on:click="deleteThread(thread.id, i)">X</button>
                         <h4>{{thread.name}}</h4>
                         <h5>id: {{thread.id}}</h5>
+                        <h6>workspace_id: {{ thread.workspace_id }}</h6>
                     </div>
                 </div>
             </li>
@@ -346,10 +364,12 @@ let users = new Vue({
                     
                     </div>
                     <div v-else>
-                        <button v-on:click="editUser = user.id">edit</button>
-                        <button v-on:click="deleteUser(user.id, i)">X</button>
-                        <h4>{{user.username}}</h4>
-                        <h5>{{user.first_name}} {{user.last_name}}</h5>
+                        <!-- <button v-on:click="editUser = user.id">edit</button>
+                        <button v-on:click="deleteUser(user.id, i)">X</button> -->
+                        <h6>id: {{user.id}}</h6>
+                        <h4>username: {{user.username}}</h4>
+                        <h5>full name: {{user.first_name}} {{user.last_name}}</h5>
+                        <h5>email: {{user.email}}</h5>
                     </div>
                 </div>
             </li>
