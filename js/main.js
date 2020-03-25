@@ -17,6 +17,7 @@ let app = new Vue({
         welcomeMessage: 'Chat App',
         chats: chatStorage.fetch(),
         addChatMessage: '',
+        conn: new WebSocket('ws://206.189.202.188:8080')
     },
 
     watch: {
@@ -33,6 +34,7 @@ let app = new Vue({
             this.chats.push({text, done: false, id: Date.now()})
             // event.target.value = ''
             this.addChatMessage = ''
+            this.conn.send(JSON.stringify(this.chats))
         },
 
         removeChat(id) {
@@ -43,6 +45,15 @@ let app = new Vue({
 
     },
     mounted() {
+        this.conn.onopen = function(e) {
+            console.log("Connection established!");
+        };
+        this.conn.onmessage = function(e) {
+        console.log(e.data);
+        };
 
+        this.conn.onclose = function(e) {
+            console.log("Connection Closed!");
+        }
     },
 });
