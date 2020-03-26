@@ -129,7 +129,7 @@ let wspace = new Vue({
     },
     methods: {
         deleteWorkspace(id, i) {
-            fetch("http://206.189.202.188:43554/workspaces" + id, {
+            fetch("https://cors-anywhere.herokuapp.com/"+"http://206.189.202.188:43554/workspaces.json" + id, {
                 method: "DELETE"
             })
             .then(() => {
@@ -137,7 +137,7 @@ let wspace = new Vue({
             })
         },
         updateWorkspace(workspace) {
-            fetch("http://206.189.202.188:43554/workspaces" + workspace.id, {
+            fetch("https://cors-anywhere.herokuapp.com/"+"http://206.189.202.188:43554/workspaces.json" + workspace.id, {
                 body: JSON.stringify(workspace),
                 method: "PUT",
                 headers: {
@@ -149,7 +149,7 @@ let wspace = new Vue({
             })
         },
         addWorkspace(name){
-            fetch("http://206.189.202.188:43554/workspaces/add.json", {
+            fetch("https://cors-anywhere.herokuapp.com/"+"http://206.189.202.188:43554/workspaces/add.json", {
                 body: JSON.stringify({"name": name}),
                 method: "POST",
                 headers: {
@@ -165,7 +165,7 @@ let wspace = new Vue({
         }
     },
     mounted() {
-        fetch("http://206.189.202.188:43554/workspaces.json")
+        fetch("https://cors-anywhere.herokuapp.com/"+"http://206.189.202.188:43554/workspaces.json")
         .then(response => response.json())
         .then((data) => {
             this.workspaces = data;
