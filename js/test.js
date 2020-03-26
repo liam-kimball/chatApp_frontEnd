@@ -124,8 +124,8 @@ let singUp = new Vue({
     `
 });
 
-let wspace = new Vue({
-    el: "#wspace",
+let workspace = new Vue({
+    el: "#workspace",
     data: {
         title: 'Name of current workspaces',
         editWorkspace: null,
@@ -135,27 +135,19 @@ let wspace = new Vue({
     },
     methods: {
         deleteWorkspace(id, i) {
-<<<<<<< HEAD
-            fetch("https://cors-anywhere.herokuapp.com/"+"http://206.189.202.188:43554/workspaces.json" + id, {
-                method: "DELETE"
-=======
+
             fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + id + ".json", {
                 method: "DELETE",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem('token')
                 },
->>>>>>> liam-test
             })
             .then(() => {
                 this.workspaces.splice(i,1);
             })
         },
         updateWorkspace(workspace) {
-<<<<<<< HEAD
-            fetch("https://cors-anywhere.herokuapp.com/"+"http://206.189.202.188:43554/workspaces.json" + workspace.id, {
-=======
             fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + workspace.id, {
->>>>>>> liam-test
                 body: JSON.stringify(workspace),
                 method: "PUT",
                 headers: {
@@ -187,14 +179,10 @@ let wspace = new Vue({
         }
     },
     mounted() {
-<<<<<<< HEAD
-        fetch("https://cors-anywhere.herokuapp.com/"+"http://206.189.202.188:43554/workspaces.json")
-=======
         fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
->>>>>>> liam-test
         .then(response => response.json())
         .then((data) => {
             console.log(data.Workspaces);
