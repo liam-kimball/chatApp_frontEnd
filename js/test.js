@@ -51,15 +51,28 @@ let login = new Vue({
     },
 
     template: `
-        <div class="container bg-dark p-3 my-3 border"> 
-            <h1>Login</h1>
-            <input type="text" name="username" v-model="username" placeholder="Username" />
-            <input type="password" name="password" v-model="password" placeholder="Password" />
-            <button type="button" v-on:click="login(username, password)">Login</button>
-            <h5>Token: {{token}}</h5>
-            <h5>User ID: {{ user_id }}
+    
+        <form class="modal-content animate"  method="post">
+        <div class="container"> 
+            <h3>Login</h3><br>
+            <input type="text" name="uname" v-model="username" placeholder="Username" required/>
+            &nbsp
+            <input type="password" name="psw" v-model="password" placeholder="Password" />
+            <br><br>
+            <button class="bottons" style="background-color: #4CAF50; color: white;" type="button" v-on:click="login(username, password)">Login</button>
+            &nbsp
+            <label>
+                <input type="checkbox" checked="checked" name="remember"> Remember me
+            </label>&nbsp &nbsp
+            <span class="psw"> <a href="#"> Forgot password?</a></span>
+            <br><br>
+            <h6>User ID: {{ user_id }} </h6>
+            <div style="font-size:11px;">Token: {{token}}</div>
+            
             <br><br>
         </div>
+        </form>
+        <br><br>
     
     `
 });
@@ -109,18 +122,26 @@ let singUp = new Vue({
 
 
     template: `
-        <div class="container bg-dark p-3 my-3 border"> 
-            <h2>Create an account</h2>
+        <form class="modal-content animate" method="post">
+        <div class="container"> 
+            <h3>Create an account</h3>
+            <br>
             <input type="text" name="first_name" v-model="first_name" placeholder="First name" />
+            &nbsp
             <input type="text" name="last_name" v-model="last_name" placeholder="Last name" />
+            &nbsp
             <input type="text" name="username" v-model="username" placeholder="Username" />
+            &nbsp
             <input type="text" name="email" v-model="email" placeholder="Email" />
+            &nbsp
             <input type="password" name="password" v-model="password" placeholder="Password" />
-            <button type="button" v-on:click="signUp(first_name, last_name, username, email, password)">Create</button>
-            <h5>Token: {{token}}</h5>
+            <br><br>
+            <button class= "buttons" style="background-color: #4CAF50; color: white;" type="button" v-on:click="signUp(first_name, last_name, username, email, password)">Create</button>
+            <br><br>
+            <div style="font-size:11px;">Token: {{token}}</div>
             <br><br>
         </div>
-    
+        </form>
     `
 });
 
@@ -190,11 +211,11 @@ let workspace = new Vue({
         })
     },
     template: `
-        <div class="container bg-dark p-3 my-3 border">
+        <div class="container">
             <h4> Workspaces: </h4>
             <li v-for="workspace, i in workspaces">
                 <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace()">
-                <div class="container p-3 my-3 border">
+                <div class="container ">
                     <div v-if="editWorkspace === workspace.id">
                         <input v-on:keyup.enter="updateWorkspace(workspace)" v-model="workspace.name" />
                         <button v-on:click="updateWorkspace(workspace)">save</button>
@@ -287,10 +308,10 @@ let threads = new Vue({
         })
     },
     template: `
-        <div class="container bg-dark p-3 my-3 border">
+        <div class="container">
             <h4> Threads: </h4>
             <li v-for="thread, i in threads">
-                <div class="container p-3 my-3 border">
+                <div class="container ">
                     <div v-if="editThread === thread.id">
                         <input v-on:keyup.enter="updateThread(thread)" v-model="thread.name" />
                         <button v-on:click="updateThread(thread)">save</button>
