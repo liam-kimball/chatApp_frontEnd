@@ -26,15 +26,7 @@
             
               <input type="text" class="welcome" placeholder="Message" v-on:keyup.enter="addChat" v-model="addChatMessage">
 
-            <ul>
-                <li v-for="chat in chats" class="flex">
-                    
-                    <span> {{chat.text}} </span>
-                    <div class="space"></div>
-                    <button class="xbutton" v-on:click="removeChat(chat.id)">X</button>
-                </li>
-
-            </ul>
+           
             
             </div>
         
