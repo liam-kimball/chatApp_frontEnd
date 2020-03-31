@@ -175,6 +175,7 @@ let workspaces = new Vue({
         },
         saveCurrentWorkspace(){
             localStorage.setItem('current_workspace', this.current_workspace);
+            localStorage.setItem('current_thread', null)
         }
     },
     mounted() {
@@ -191,8 +192,9 @@ let workspaces = new Vue({
     template: `
         <div class="container bg-dark p-3 my-3 border">
             <h4> Workspaces: </h4>
+            <h6> Current workspace: {{ current_workspace }}</h6>
             <li v-for="workspace, i in workspaces">
-                <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace()">
+                <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace(); threads.updateThreadsList();">
                 <div class="container p-3 my-3 border">
                     <div v-if="editWorkspace === workspace.id">
                         <input v-on:keyup.enter="updateWorkspace(workspace)" v-model="workspace.name" />
@@ -208,7 +210,6 @@ let workspaces = new Vue({
                     </div>
                 </div>
             </li>
-            <span>Selected: {{ current_workspace }}</span>
             <h5>Create a new workspace:</h5>
             <input v-model="newWorkspace" v-on:keyup.enter='addWorkspace(newWorkspace)'/>
             <button v-on:click="addWorkspace(newWorkspace)">Add</button>
@@ -224,6 +225,7 @@ let threads = new Vue({
         editThread: null,
         threads: [],
         newThread: '',
+        current_thread: null,
     },
     methods: {
         deleteThread(id, i) {
@@ -264,6 +266,24 @@ let threads = new Vue({
                 console.log(data);
                 //this.workspaces.push(data);
             })             
+        },
+        updateThreadsList(){
+            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads.json", {
+                method: "GET",
+                headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+            })
+            .then(response => response.json())
+            .then((data) => {
+                console.log(data.Threads);
+                var filtered = (data.Threads).filter(function (entry) {
+                    return JSON.stringify(entry.workspace_id) === localStorage.getItem('current_workspace');
+                });
+                console.log(filtered);
+                this.threads = filtered;
+            })
+        },
+        saveCurrentThread(){
+            localStorage.setItem('current_thread', this.current_thread);
         }
     },
     mounted() {
@@ -288,7 +308,9 @@ let threads = new Vue({
     template: `
         <div class="container bg-dark p-3 my-3 border">
             <h4> Threads: </h4>
+            <h6> Current thread: {{ current_thread }}</h6>
             <li v-for="thread, i in threads">
+            <input type="radio" id="{{ thread.id }}" :value="thread.id" v-model="current_thread" v-on:change="saveCurrentThread(); messages.updateMessagesList();">
                 <div class="container p-3 my-3 border">
                     <div v-if="editThread === thread.id">
                         <input v-on:keyup.enter="updateThread(thread)" v-model="thread.name" />
