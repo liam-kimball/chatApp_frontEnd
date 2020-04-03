@@ -181,7 +181,7 @@ h1.welcome {
         color: #999;
       }
 
-      .main {
+      /* .main {
         margin-left: 160px; /* Same as the width of the sidenav */
         /* font-size: 28px; Increased text to enable scrolling */
         /* padding: 0px 10px;
@@ -222,4 +222,4 @@ h1.welcome {
     .sidenav a {font-size: 18px;}
     } */
   
-    /*  */
+  

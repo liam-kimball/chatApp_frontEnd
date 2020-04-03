@@ -230,9 +230,18 @@ let app = new Vue({
     el: "#chatApp",
     data: {
         welcomeMessage: 'Chat App',
+       
+    },
+});
+
+
+let message = new Vue({
+    el: "#message",
+    data: {
+        welcomeMessage: 'Chat App',
         //chats: chatStorage.fetch(),
         chats: '',
-       
+       messageData:[],
         addChatMessage: '',
         conn: new WebSocket('ws://206.189.202.188:8080')
     },
@@ -261,9 +270,15 @@ let app = new Vue({
             .then(response => response.json())
             .then((data) => {
                 console.log(data);
+                this.token = localStorage.getItem('token');
+                this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
                 //this.workspaces.push(data.Work_Space);
-                this.conn.send(JSON.stringify(data))
+                this.conn.send(JSON.stringify({"body":text, "user_id":this.user_id}))
+                this.messageData = data
+            
+                console.log(this.messageData)
             })  
+            
             //this.chats = ({message:this.text, id:this.user_id})
             this.addChatMessage = ''
         },
@@ -281,10 +296,42 @@ let app = new Vue({
         };
         this.conn.onmessage = function(e) {
         console.log(e.data);
+        //this.messageData = e.data
+        this.messageData = JSON.parse(e.data);
+        console.log(this.messageData)
+      
         };
 
         this.conn.onclose = function(e) {
             console.log("Connection Closed!");
         }
     },
+template:`
+
+<body class="bg-secondary">
+<div>
+    <input type="text" class="welcome" placeholder="Message" v-on:keyup.enter="addChat" v-model="addChatMessage">
+    </div>
+<div class="container-fluid p-3 my-3 text-white">
+   
+    <div class="row">
+
+        <table class="table table-striped">
+            <thead>
+              <tr>
+                <th colspan="4" scope="col"><strong>Chat Room</strong></th>
+              </tr>
+              
+              <tr v-for="message in messageData" ><td valign="top"><div><strong> From: {{message.user_id}} </strong></div><div>
+              {{message.body}} </div><td align="right"> Date:{{message.created}} </td> </tr>
+              
+            
+              
+            </thead>
+        </table>
+    </div>
+    </div>
+    </body>
+
+`
 });

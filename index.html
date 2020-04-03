@@ -23,51 +23,17 @@
                 <a href="users.html">Users</a>
                 <a href="dms.html">Direct Messages</a>
               </div>
-
-            <div id="id01" class="modal">
-                
-                <form class="modal-content animate"  method="post">
-
-                    <div class="container">
-                    <label for="uname"><b>Username</b></label>
-                    <input type="text" placeholder="Enter Username" name="uname" required>
-                    &nbsp
-                    <label for="psw"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="psw" required>
-                    &nbsp
-                    <button type="submit">Login</button> 
-                    &nbsp 
-                    <label>
-                        <input type="checkbox" checked="checked" name="remember"> Remember me
-                    </label>
-                        <span class="psw"> <a href="#"> Forgot password?</a></span>
-                    </div>
-                    
-                </form>
-
-                <form class="modal-content animate" method="post">
-                    <div class="container">
-                      
-                      <label for="email"><b>Email</b></label>
-                      <input type="text" placeholder="Enter Email" name="email" required>
-                      &nbsp
-                      <label for="psw"><b>Password</b></label>
-                      <input type="password" placeholder="Enter Password" name="psw" required>
-                      &nbsp
-                      <label for="psw-repeat"><b>Repeat Password</b></label>
-                      <input type="password" placeholder="Repeat Password" name="psw-repeat" required>
-                      &nbsp 
-                      <button type="submit" class="signupbtn">Sign Up</button>
-                    </div>
-                  </form>
-
-            </div>
+              
+       <!--</div> move last div to this div if you want to see tokens--> 
+              <div class="container-fluid p-3 my-3 text-white">
+                <div id="login"></div>
+                <div id="signUp"></div>
+                </div>
             
-        </div>
-
+            </div>
         
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js"></script>
+        <script src="js/vue.min.js"></script>
         <script src="js/main.js"></script>
     </body>
 </html>

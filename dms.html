@@ -18,20 +18,17 @@
             </div>
 
             <div class="sidebar">
-                <a  href="index.html">Home</a>
+                <a href="index.html">Home</a>
                 <a href="channels.html">Channel</a>
                 <a href="users.html">Users</a>
                 <a class="active" href="dms.html">Direct Messages</a>
               </div>
-            
-              <input type="text" class="welcome" placeholder="Message" v-on:keyup.enter="addChat" v-model="addChatMessage">
+              
+       <!--</div> move last div to this div if you want to see tokens--> 
 
-           
+                <div id="message"></div>
             
-            </div>
-        
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js"></script>
+        <script src="js/vue.min.js"></script>
         <script src="js/main.js"></script>
        
     </body>
