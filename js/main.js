@@ -57,7 +57,7 @@ let login = new Vue({
     },
 
     template: `
-        <div class="container bg-dark p-3 my-3 border"> 
+        <div class="container p-5 my-5 border"> 
             <h1>Login</h1>
             <input type="text" name="username" v-model="username" placeholder="Username" />
             <input type="password" name="password" v-model="password" placeholder="Password" />
@@ -115,7 +115,7 @@ let signUp = new Vue({
 
 
     template: `
-        <div class="container bg-dark p-3 my-3 border"> 
+        <div class="container p-5 my-5 border"> 
             <h2>Create an account</h2>
             <input type="text" name="first_name" v-model="first_name" placeholder="First name" />
             <input type="text" name="last_name" v-model="last_name" placeholder="Last name" />
@@ -196,7 +196,7 @@ let workspaces = new Vue({
         })
     },
     template: `
-        <div class="container bg-dark p-3 my-3 border">
+        <div class="container p-3 my-3 border">
             <h4> Workspaces: </h4>
             <h6> Current workspace: {{ current_workspace }}</h6>
             <li v-for="workspace, i in workspaces">
@@ -312,7 +312,7 @@ let threads = new Vue({
         })
     },
     template: `
-        <div class="container bg-dark p-3 my-3 border">
+        <div class="container p-3 my-3 border">
             <h4> Threads: </h4>
             <h6> Current thread: {{ current_thread }}</h6>
             <li v-for="thread, i in threads">
@@ -381,7 +381,7 @@ let users = new Vue({
         })
     },
     template: `
-        <div class="container bg-dark p-3 my-3 border">
+        <div class="container p-3 my-3 border">
             <p>**admin only**</p>
             <h4> Users: </h4>
             <li v-for="user, i in users">
@@ -472,9 +472,9 @@ let message = new Vue({
             console.log(JSON.stringify(data));
             if(data.thread_id === localStorage.getItem('current_thread')){
                 if(data.from == "Me") {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-3 my-3 border">' + '<h6>UserName: ' + data.Username + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-3 my-3 border">' + '<h6>UserName: ' + data.Username + '  ' + data.user_id + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
                 } else {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-3 my-3 border">' + '<h6>UserName: ' + data.Username + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-3 my-3 border">' + '<h6>UserName: ' + data.Username + '  ' + data.user_id + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
                 }
             }
             
@@ -484,7 +484,7 @@ let message = new Vue({
         }
     },
     template: `
-        <div class="container bg-dark p-3 my-3 border">
+        <div class="container p-3 my-3 border">
             <h4> Messages: </h4>
             <!-- <li v-for="chat, i in chats">
                 <div class="container p-3 my-3 border">
