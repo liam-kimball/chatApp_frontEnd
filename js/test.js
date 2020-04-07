@@ -1,4 +1,11 @@
+function logout(){
+    localStorage.removeItem('token');
+    localStorage.removeItem('current_workspace');
+    localStorage.removeItem('current_thread');
+    localStorage.removeItem('user_id');
+    location.reload();
 
+}
 let login = new Vue({
     el: "#login",
     data: {
@@ -10,6 +17,7 @@ let login = new Vue({
 
     methods: {
         login(username, password) {
+            console.log("start login");
             //console.log(JSON.stringify({"username": username, "password": password}));
             // add proxy url to allow calls from local system, will need to be taken out later
             fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/users/login.json", {
@@ -24,6 +32,7 @@ let login = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
+                localStorage.setItem('user_id', this.user_id);
                 localStorage.setItem('token', data.data.token);
                 try {
                     this.token = localStorage.getItem('token');
@@ -32,10 +41,11 @@ let login = new Vue({
                     console.log('Cant find token');
                     //localStorage.removeItem('token');
                 }
-                localStorage.setItem('user_id', this.user_id);
+                
             })
-            
-        }
+            console.log(localStorage.getItem('user_id'));
+            console.log("finish login");
+        },
     },
     mounted() {
         if (localStorage.getItem('token')) {
@@ -59,7 +69,7 @@ let login = new Vue({
             <h1>Login</h1>
             <input type="text" name="username" v-model="username" placeholder="Username" />
             <input type="password" name="password" v-model="password" placeholder="Password" />
-            <button type="button" v-on:click="login(username, password)">Login</button>
+            <button type="button" v-on:click="login(username, password); workspaces.updateWorkspaceList();">Login</button>
             <h5>Token: {{token}}</h5>
             <h5>User ID: {{ user_id }}
             <br><br>
@@ -180,18 +190,37 @@ let workspaces = new Vue({
         saveCurrentWorkspace(){
             localStorage.setItem('current_workspace', this.current_workspace);
             localStorage.setItem('current_thread', null)
-        }
+        },
+        updateWorkspaceList(){
+            console.log(localStorage.getItem('user_id'));
+            console.log("start workspace");
+            if(localStorage.getItem('user_id') != 'null'){
+                fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces.json", {
+                 method: "GET",    
+                 headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+                 })
+                 .then(response => response.json())
+                 .then((data) => {
+                     console.log(data.Workspaces);
+                     this.workspaces = data.Workspaces;
+                 }) 
+             }
+             console.log("finish workspace");
+        },
     },
     mounted() {
-        fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces.json", {
+        //console.log(localStorage.getItem('user_id'));
+        if(localStorage.getItem('user_id') != 'null'){
+           fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
-        })
-        .then(response => response.json())
-        .then((data) => {
-            console.log(data.Workspaces);
-            this.workspaces = data.Workspaces;
-        })
+            })
+            .then(response => response.json())
+            .then((data) => {
+                console.log(data.Workspaces);
+                this.workspaces = data.Workspaces;
+            }) 
+        }
     },
     template: `
         <div class="container bg-dark p-3 my-3 border">
@@ -278,11 +307,11 @@ let threads = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                console.log(data.Threads);
+                //console.log(data.Threads);
                 var filtered = (data.Threads).filter(function (entry) {
                     return JSON.stringify(entry.workspace_id) === localStorage.getItem('current_workspace');
                 });
-                console.log(filtered);
+                //console.log(filtered);
                 this.threads = filtered;
             })
         },
@@ -297,15 +326,11 @@ let threads = new Vue({
         })
         .then(response => response.json())
         .then((data) => {
-            console.log(data.Threads);
+            //console.log(data.Threads);
             var filtered = (data.Threads).filter(function (entry) {
-                //console.log(entry);
-                //console.log("entry " + entry.workspace_id);
-                //console.log("storage " + localStorage.getItem('current_workspace'));
-                //console.log(JSON.stringify(entry.workspace_id) === localStorage.getItem('current_workspace'));
                 return JSON.stringify(entry.workspace_id) === localStorage.getItem('current_workspace');
             });
-            console.log(filtered);
+            //console.log(filtered);
             this.threads = filtered;
         })
     },
@@ -446,7 +471,7 @@ let message = new Vue({
                 this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
                 //this.workspaces.push(data.Work_Space);
                 localStorage.setItem('user_id', data.user_id);
-                this.conn.send(JSON.stringify({"body":text, "user_id":this.user_id}))
+                this.conn.send(JSON.stringify({"body":text, "user_id":this.user_id, "thread_id":localStorage.getItem('current_thread')}))
             })  
             //this.chats = ({message:this.text, id:this.user_id})
             this.addChatMessage = '';
@@ -465,13 +490,15 @@ let message = new Vue({
             console.log("Connection established!");
         };
         this.conn.onmessage = function(e) {
-            console.log(e.data);
+            //console.log(e.data);
             var data = JSON.parse(e.data);
             console.log(JSON.stringify(data));
-            if(data.from == "Me") {
-                document.getElementById("chats").innerHTML += '<div class="container bg-info p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6>' + data.body + '</div>';
-            } else {
-                document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6>' + data.body + '</div>';
+            if(data.thread_id === localStorage.getItem('current_thread')){
+                if(data.from == "Me") {
+                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
+                } else {
+                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
+                }
             }
             
         }
