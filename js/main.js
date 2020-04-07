@@ -445,7 +445,7 @@ let message = new Vue({
                 this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
                 //this.workspaces.push(data.Work_Space);
                 localStorage.setItem('user_id', data.user_id);
-                this.conn.send(JSON.stringify({"body":text, "user_id":this.user_id}))
+                this.conn.send(JSON.stringify({"body":text, "user_id":this.user_id, "thread_id":localStorage.getItem('current_thread')}))
             })  
             //this.chats = ({message:this.text, id:this.user_id})
             this.addChatMessage = '';
@@ -464,13 +464,15 @@ let message = new Vue({
             console.log("Connection established!");
         };
         this.conn.onmessage = function(e) {
-            console.log(e.data);
+            //console.log(e.data);
             var data = JSON.parse(e.data);
             console.log(JSON.stringify(data));
-            if(data.from == "Me") {
-                document.getElementById("chats").innerHTML += '<div class="container bg-info p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6>' + data.body + '</div>';
-            } else {
-                document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6>' + data.body + '</div>';
+            if(data.thread_id === localStorage.getItem('current_thread')){
+                if(data.from == "Me") {
+                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
+                } else {
+                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
+                }
             }
             
         }
