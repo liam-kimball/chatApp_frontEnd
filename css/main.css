@@ -197,11 +197,7 @@ h1.welcome {
       }
 
       
-      .button a:hover:(.active) {
-        background-color: #555;
-        color: white;
-      }
-
+      
   
   /* .sidenav {
     height: 100%;

@@ -32,11 +32,14 @@ let login = new Vue({
                     //localStorage.removeItem('token');
                 }
                 localStorage.setItem('user_id', this.user_id);
+                localStorage.setItem('user_names', this.username);
             })
             
         }
     },
     mounted() {
+
+        
         if (localStorage.getItem('token')) {
             try {
                 this.token = localStorage.getItem('token');
@@ -445,7 +448,7 @@ let message = new Vue({
                 this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
                 //this.workspaces.push(data.Work_Space);
                 localStorage.setItem('user_id', data.user_id);
-                this.conn.send(JSON.stringify({"body":text, "user_id":this.user_id, "thread_id":localStorage.getItem('current_thread')}))
+                this.conn.send(JSON.stringify({"body":text, "user_id":this.user_id, "thread_id":localStorage.getItem('current_thread'), "Username":localStorage.getItem('user_names')}))
             })  
             //this.chats = ({message:this.text, id:this.user_id})
             this.addChatMessage = '';
@@ -469,9 +472,9 @@ let message = new Vue({
             console.log(JSON.stringify(data));
             if(data.thread_id === localStorage.getItem('current_thread')){
                 if(data.from == "Me") {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-3 my-3 border">' + '<h6>UserName: ' + data.Username + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
                 } else {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-3 my-3 border">' + '<h6>UserName: ' + data.Username + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
                 }
             }
             
