@@ -1,3 +1,12 @@
+function logout(){
+    localStorage.removeItem('token');
+    localStorage.removeItem('current_workspace');
+    localStorage.removeItem('current_thread');
+    localStorage.removeItem('user_id');
+    location.reload();
+
+}
+
 let login = new Vue({
     el: "#login",
     data: {
