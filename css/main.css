@@ -197,18 +197,7 @@ h1.welcome {
       }
 
       
-      .button a:hover:(.active) {
-        background-color: #555;
-        color: white;
-      }
-
-       
-         /* Same as the width of the sidenav */
-        /* font-size: 28px; Increased text to enable scrolling */
-        /* padding: 0px 10px;
-        }
-
-        
+      
   
   /* .sidenav {
     height: 100%;
