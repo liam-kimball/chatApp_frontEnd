@@ -5,6 +5,16 @@ h1.welcome {
     height: 1200%;
   
   }
+
+  #messages {
+    height: 200px;
+    background: whitesmoke;
+    overflow: auto;
+  }
+  #chat-room-frm {
+    margin-top: 10px;
+  }
+  
   input.welcome {
     margin-left: auto;
     margin-right: auto;

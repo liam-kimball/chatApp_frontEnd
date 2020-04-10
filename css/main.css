@@ -197,7 +197,14 @@ h1.welcome {
       }
 
       
-      
+      #messages {
+        height: 200px;
+        background: whitesmoke;
+        overflow: auto;
+      }
+      #chat-room-frm {
+        margin-top: 10px;
+      }  
   
   /* .sidenav {
     height: 100%;
