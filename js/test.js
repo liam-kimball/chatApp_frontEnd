@@ -1,11 +1,13 @@
-function logout(){
+
+function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('current_workspace');
     localStorage.removeItem('current_thread');
     localStorage.removeItem('user_id');
+    localStorage.setItem('display_chat', false);
     location.reload();
-
 }
+
 let login = new Vue({
     el: "#login",
     data: {
@@ -17,7 +19,6 @@ let login = new Vue({
 
     methods: {
         login(username, password) {
-            console.log("start login");
             //console.log(JSON.stringify({"username": username, "password": password}));
             // add proxy url to allow calls from local system, will need to be taken out later
             fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/users/login.json", {
@@ -43,8 +44,6 @@ let login = new Vue({
                 }
                 
             })
-            console.log(localStorage.getItem('user_id'));
-            console.log("finish login");
         },
     },
     mounted() {
@@ -193,6 +192,7 @@ let workspaces = new Vue({
         },
         updateWorkspaceList(){
             console.log(localStorage.getItem('user_id'));
+            console.log(localStorage.getItem('display_chat'));
             console.log("start workspace");
             if(localStorage.getItem('user_id') != 'null'){
                 fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces.json", {
@@ -339,7 +339,7 @@ let threads = new Vue({
             <h4> Threads: </h4>
             <h6> Current thread: {{ current_thread }}</h6>
             <li v-for="thread, i in threads">
-            <input type="radio" id="{{ thread.id }}" :value="thread.id" v-model="current_thread" v-on:change="saveCurrentThread()">
+            <input type="radio" id="{{ thread.id }}" :value="thread.id" v-model="current_thread" v-on:change="saveCurrentThread(); message.updateMessageList();">
                 <div class="container p-3 my-3 border">
                     <div v-if="editThread === thread.id">
                         <input v-on:keyup.enter="updateThread(thread)" v-model="thread.name" />
@@ -482,10 +482,29 @@ let message = new Vue({
             //this.chats = this.chats.filter(chat => chat.id !== id)
         },
 
-
+        updateMessageList() {
+            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
+                method: "GET",
+                headers: { "Authorization": "Bearer " + localStorage.getItem('token') },
+            })
+            .then(response => response.json())
+            .then((data) => {
+                console.log(data);
+                this.chats = data.Messages;     
+            })  
+        }
 
     },
     mounted() {
+        fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
+                method: "GET",
+                headers: { "Authorization": "Bearer " + localStorage.getItem('token') },
+            })
+            .then(response => response.json())
+            .then((data) => {
+                console.log(data);
+                this.chats = data.Messages;     
+            });
         this.conn.onopen = function(e) {
             console.log("Connection established!");
         };
@@ -493,13 +512,22 @@ let message = new Vue({
             //console.log(e.data);
             var data = JSON.parse(e.data);
             console.log(JSON.stringify(data));
-            if(data.thread_id === localStorage.getItem('current_thread')){
+            /*if(data.thread_id === localStorage.getItem('current_thread')){
                 if(data.from == "Me") {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><small class="small">' + data.created + '</small></div>';
                 } else {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-3 my-3 border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><br><small class="small">' + data.created + '</small></div>';
                 }
+            } */
+            if(data.thread_id == localStorage.getItem('current_thread')) {
+                this.chats.push({
+                    "body": data.body,
+                    "user_id": data.user_id,
+                    "thread_id": data.thread_id,
+                    "created": data.created,
+                })
             }
+            
             
         }
         this.conn.onclose = function(e) {
@@ -509,12 +537,22 @@ let message = new Vue({
     template: `
         <div class="container bg-dark p-3 my-3 border">
             <h4> Messages: </h4>
-            <!-- <li v-for="chat, i in chats">
-                <div class="container p-3 my-3 border">
-                        <h4>{{chat.text}}</h4>
+            <li v-for="chat, i in chats" style="list-style-type:none;">
+                <template v-if="chat.user_id == localStorage.getItem('user_id')">
+                    <div class="container bg-info p-2 border">
+                        <h6>User Id: {{chat.user_id}}</h6>
+                        <p>{{chat.body}}</p>
+                        <small>{{chat.created}}</small>
                     </div>
-                </div>
-            </li> -->
+                </template>
+                <template v-else>
+                    <div class="container bg-secondary p-2 border">
+                        <h6>User Id: {{chat.user_id}}</h6>
+                        <p>{{chat.body}}</p>
+                        <small>{{chat.created}}</small>
+                    </div>
+                </template>
+            </li>
             <input v-model="newMessage" v-on:keyup.enter='addChat(newMessage)'/>
             <small>adding item...{{newMessage}}</small>
             <div id="chats"></div>
