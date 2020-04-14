@@ -232,6 +232,7 @@ let workspaces = new Vue({
         </div>
     `
 });
+
 let threads = new Vue({
     el: "#thread",
     data: {
@@ -344,6 +345,7 @@ let threads = new Vue({
         </div>
     `
 });
+
 let users = new Vue({
     el: "#users",
     data: {
@@ -502,9 +504,9 @@ let message = new Vue({
             console.log(JSON.stringify(data));
             if(data.thread_id === localStorage.getItem('current_thread')){
                 if(data.from == "Me") {
-                    document.getElementById("chats").innerHTML += '<div class="container border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-info border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
                 } else {
-                    document.getElementById("chats").innerHTML += '<div class="container border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
                 }
             }
             var temp = document.getElementById('chatsWindow');
@@ -521,14 +523,14 @@ let message = new Vue({
             <div id="chatsWindow" class="overflow-auto" style="height: 500px;">
                 <li v-for="chat, i in chats" style="list-style-type:none;">
                     <template v-if="chat.user_id == localStorage.getItem('user_id')">
-                        <div class="container border">
+                        <div class="container bg-info border">
                             <h6>User Id: {{chat.user_id}}</h6>
                             <p>{{chat.body}}</p>
                             <span class="time-right">{{chat.created}}</span>
                         </div>
                     </template>
                     <template v-else>
-                        <div class="container border">
+                        <div class="container bg-secondary border">
                             <h6>User Id: {{chat.user_id}}</h6>
                             <p>{{chat.body}}</p>
                             <span class="time-right">{{chat.created}}</span>
