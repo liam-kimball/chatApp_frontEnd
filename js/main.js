@@ -418,7 +418,7 @@ let message = new Vue({
         chats: [],
        
         addChatMessage: '',
-        conn: new WebSocket('ws://206.189.202.188:8080'),
+        conn: new WebSocket('wss://206.189.202.188:8080'),
         newMessage: ''
     },
 
