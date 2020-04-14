@@ -159,7 +159,7 @@ let workspaces = new Vue({
             })
         },
         updateWorkspace(workspace) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + workspace.id, {
+            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + workspace.id + ".json", {
                 body: JSON.stringify(workspace),
                 method: "PUT",
                 headers: {
@@ -182,8 +182,7 @@ let workspaces = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                console.log(data);
-                //this.workspaces.push(data.Work_Space);
+                this.workspaces.push(data.Work_Space);
             })             
         },
         saveCurrentWorkspace(){
@@ -191,9 +190,6 @@ let workspaces = new Vue({
             localStorage.setItem('current_thread', null)
         },
         updateWorkspaceList(){
-            console.log(localStorage.getItem('user_id'));
-            console.log(localStorage.getItem('display_chat'));
-            console.log("start workspace");
             if(localStorage.getItem('user_id') != 'null'){
                 fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces.json", {
                  method: "GET",    
@@ -205,7 +201,6 @@ let workspaces = new Vue({
                      this.workspaces = data.Workspaces;
                  }) 
              }
-             console.log("finish workspace");
         },
     },
     mounted() {
@@ -296,8 +291,8 @@ let threads = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                console.log(data);
-                //this.workspaces.push(data);
+                //console.log(data);
+                this.workspaces.push(data);
             })             
         },
         updateThreadsList(){
