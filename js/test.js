@@ -1,8 +1,10 @@
+
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('current_workspace');
     localStorage.removeItem('current_thread');
     localStorage.removeItem('user_id');
+    localStorage.setItem('display_chat', false);
     location.reload();
 }
 
@@ -31,6 +33,7 @@ let login = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
+                localStorage.setItem('user_id', this.user_id);
                 localStorage.setItem('token', data.data.token);
                 try {
                     this.token = localStorage.getItem('token');
@@ -39,15 +42,11 @@ let login = new Vue({
                     console.log('Cant find token');
                     //localStorage.removeItem('token');
                 }
-                localStorage.setItem('user_id', this.user_id);
-                localStorage.setItem('username', this.username);
+                
             })
-            
-        }
+        },
     },
     mounted() {
-
-        
         if (localStorage.getItem('token')) {
             try {
                 this.token = localStorage.getItem('token');
@@ -65,11 +64,11 @@ let login = new Vue({
     },
 
     template: `
-        <div class="container p-5 my-5 border"> 
+        <div class="container bg-dark p-3 my-3 border"> 
             <h1>Login</h1>
             <input type="text" name="username" v-model="username" placeholder="Username" />
             <input type="password" name="password" v-model="password" placeholder="Password" />
-            <button type="button" v-on:click="login(username, password)">Login</button>
+            <button type="button" v-on:click="login(username, password); workspaces.updateWorkspaceList();">Login</button>
             <h5>Token: {{token}}</h5>
             <h5>User ID: {{ user_id }}
             <br><br>
@@ -123,7 +122,7 @@ let signUp = new Vue({
 
 
     template: `
-        <div class="container p-5 my-5 border"> 
+        <div class="container bg-dark p-3 my-3 border"> 
             <h2>Create an account</h2>
             <input type="text" name="first_name" v-model="first_name" placeholder="First name" />
             <input type="text" name="last_name" v-model="last_name" placeholder="Last name" />
@@ -183,30 +182,45 @@ let workspaces = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                //console.log(data);
                 this.workspaces.push(data.Work_Space);
             })             
         },
         saveCurrentWorkspace(){
             localStorage.setItem('current_workspace', this.current_workspace);
             localStorage.setItem('current_thread', null)
-        }
+        },
+        updateWorkspaceList(){
+            if(localStorage.getItem('user_id') != 'null'){
+                fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces.json", {
+                 method: "GET",    
+                 headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+                 })
+                 .then(response => response.json())
+                 .then((data) => {
+                     console.log(data.Workspaces);
+                     this.workspaces = data.Workspaces;
+                 }) 
+             }
+        },
     },
     mounted() {
-        fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces.json", {
+        //console.log(localStorage.getItem('user_id'));
+        if(localStorage.getItem('user_id') != 'null'){
+           fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
-        })
-        .then(response => response.json())
-        .then((data) => {
-            //console.log(data.Workspaces);
-            this.workspaces = data.Workspaces;
-        })
+            })
+            .then(response => response.json())
+            .then((data) => {
+                console.log(data.Workspaces);
+                this.workspaces = data.Workspaces;
+            }) 
+        }
     },
     template: `
-        <div class="container p-3 my-3 border">
+        <div class="container bg-dark p-3 my-3 border">
             <h4> Workspaces: </h4>
-           <!--<h6> Current workspace: {{ current_workspace }}</h6>-->
+            <h6> Current workspace: {{ current_workspace }}</h6>
             <li v-for="workspace, i in workspaces">
                 <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace(); threads.updateThreadsList();">
                 <div class="container p-3 my-3 border">
@@ -216,12 +230,11 @@ let workspaces = new Vue({
                     
                     </div>
                     <div v-else>
-                        <h6>{{workspace.name}}</h6>
-                        
                         <button v-on:click="editWorkspace = workspace.id">edit</button>
                         <button v-on:click="deleteWorkspace(workspace.id, i)">X</button>
-                        <!--<h5>id: {{workspace.id}}</h5>-->
-                        <!--<p>owner_id: {{workspace.owner_user_id}}</p>-->
+                        <h4>{{workspace.name}}</h4>
+                        <h5>id: {{workspace.id}}</h5>
+                        <p>owner_id: {{workspace.owner_user_id}}</p>
                     </div>
                 </div>
             </li>
@@ -244,7 +257,7 @@ let threads = new Vue({
     },
     methods: {
         deleteThread(id, i) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/" + id + ".json", {
+            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/" + id, {
                 method: "DELETE"
             })
             .then(() => {
@@ -252,7 +265,7 @@ let threads = new Vue({
             })
         },
         updateThreads(thread) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/" + thread.id + ".json", {
+            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/" + thread.id, {
                 body: JSON.stringify(thread),
                 method: "PUT",
                 headers: {
@@ -317,9 +330,9 @@ let threads = new Vue({
         })
     },
     template: `
-        <div class="container p-3 my-3 border">
+        <div class="container bg-dark p-3 my-3 border">
             <h4> Threads: </h4>
-          <!--  <h6> Current thread: {{ current_thread }}</h6> -->
+            <h6> Current thread: {{ current_thread }}</h6>
             <li v-for="thread, i in threads">
             <input type="radio" id="{{ thread.id }}" :value="thread.id" v-model="current_thread" v-on:change="saveCurrentThread(); message.updateMessageList();">
                 <div class="container p-3 my-3 border">
@@ -329,12 +342,11 @@ let threads = new Vue({
                     
                     </div>
                     <div v-else>
-                        <h6>{{thread.name}}</h6>
                         <button v-on:click="editThread = thread.id">edit</button>
                         <button v-on:click="deleteThread(thread.id, i)">X</button>
-                        
-                       <!--<h5>id: {{thread.id}}</h5>-->
-                        <!--<h6>workspace_id: {{ thread.workspace_id }}</h6>-->
+                        <h4>{{thread.name}}</h4>
+                        <h5>id: {{thread.id}}</h5>
+                        <h6>workspace_id: {{ thread.workspace_id }}</h6>
                     </div>
                 </div>
             </li>
@@ -387,7 +399,7 @@ let users = new Vue({
         })
     },
     template: `
-        <div class="container p-3 my-3 border">
+        <div class="container bg-dark p-3 my-3 border">
             <p>**admin only**</p>
             <h4> Users: </h4>
             <li v-for="user, i in users">
@@ -410,7 +422,6 @@ let users = new Vue({
         </div>
     `
 });
-
 
 let message = new Vue({
     el: "#message",
@@ -437,11 +448,10 @@ let message = new Vue({
             //const text = event.target.value
            //this.chats.push({text, done: false, id: Date.now()})
             // event.target.value = ''
-            fetch("http://206.189.202.188:43554/messages/add.json", {
+            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/messages/add.json", {
                 body: JSON.stringify({
                     "body": text,
-                    "thread_id": localStorage.getItem('current_thread'),
-                    "username": localStorage.getItem('username'),
+                    "thread_id": localStorage.getItem('current_thread')
                 }),
                 method: "POST",
                 headers: {
@@ -456,12 +466,7 @@ let message = new Vue({
                 this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
                 //this.workspaces.push(data.Work_Space);
                 localStorage.setItem('user_id', data.user_id);
-                this.conn.send(JSON.stringify({
-                    "body": text, 
-                    "user_id": this.user_id, 
-                    "thread_id": localStorage.getItem('current_thread'), 
-                    "username": localStorage.getItem('username'),
-                }))
+                this.conn.send(JSON.stringify({"body":text, "user_id":this.user_id, "thread_id":localStorage.getItem('current_thread')}))
             })  
             //this.chats = ({message:this.text, id:this.user_id})
             this.addChatMessage = '';
@@ -474,13 +479,13 @@ let message = new Vue({
 
         updateMessageList() {
             document.getElementById('chats').innerHTML = '';
-            fetch("http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
+            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
                 method: "GET",
                 headers: { "Authorization": "Bearer " + localStorage.getItem('token') },
             })
             .then(response => response.json())
             .then((data) => {
-                //console.log(data);
+                console.log(data);
                 this.chats = data.Messages;     
             });
             var temp = document.getElementById('chatsWindow');
@@ -489,7 +494,7 @@ let message = new Vue({
 
     },
     mounted() {
-        fetch("http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
+        fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
             method: "GET",
             headers: { "Authorization": "Bearer " + localStorage.getItem('token') },
         })
@@ -510,9 +515,9 @@ let message = new Vue({
             console.log(JSON.stringify(data));
             if(data.thread_id === localStorage.getItem('current_thread')){
                 if(data.from == "Me") {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-2 my-1 border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><small class="small">' + data.created + '</small></div>';
                 } else {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-2 my-1 border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><small class="small">' + data.created + '</small></div>';
                 }
             }
             var temp = document.getElementById('chatsWindow');
@@ -524,27 +529,26 @@ let message = new Vue({
         }
     },
     template: `
-        <div class="container p-3 my-3 border">
+        <div class="container bg-dark p-3 my-3 border">
             <h4> Messages: </h4>
             <div id="chatsWindow" class="overflow-auto" style="height: 500px;">
                 <li v-for="chat, i in chats" style="list-style-type:none;">
                     <template v-if="chat.user_id == localStorage.getItem('user_id')">
                         <div class="container bg-info p-2 my-1 border">
-                            <h6>{{chat.username}}:</h6>
+                            <h6>User Id: {{chat.user_id}}</h6>
                             <p>{{chat.body}}</p>
-                            <span class="time-right">{{chat.created}}</span>
+                            <small>{{chat.created}}</small>
                         </div>
                     </template>
                     <template v-else>
                         <div class="container bg-secondary p-2 my-1 border">
-                            <h6>{{chat.username}}:</h6>
+                            <h6>User Id: {{chat.user_id}}</h6>
                             <p>{{chat.body}}</p>
-                            <span class="time-right">{{chat.created}}</span>
+                            <small>{{chat.created}}</small>
                         </div>
                     </template>
                 </li>
                 <div id="chats"></div>
-                
             </div>
             <input class="w-75 px-2 my-3" v-model="newMessage" v-on:keyup.enter="addChat(newMessage)"/>
             <small>adding item...{{newMessage}}</small>

@@ -41,15 +41,14 @@ h1.welcome {
     transition: all 0.2s;
   }
   
-  li {
+  /* li {
     margin: 10px 0;
     font-family: monospace;
     font-size: 12pt;
-    padding: 10px;
     border: solid;
     border-color: black;
     border-radius: 1px;
-  }
+  } */
   
  
   
