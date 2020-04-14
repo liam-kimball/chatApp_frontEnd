@@ -20,7 +20,7 @@ let login = new Vue({
         login(username, password) {
             //console.log(JSON.stringify({"username": username, "password": password}));
             // add proxy url to allow calls from local system, will need to be taken out later
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/users/login.json", {
+            fetch("http://206.189.202.188:43554/users/login.json", {
                 body: JSON.stringify({
                     "username": username,
                     "password": password
@@ -94,7 +94,7 @@ let signUp = new Vue({
     methods: {
         signUp(first_name, last_name, username, email, password) {
             // add proxy url to allow calls from local system, will need to be taken out later
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/users/add.json", {
+            fetch("http://206.189.202.188:43554/users/add.json", {
                 body: JSON.stringify({
                     "first_name" : first_name,
                     "last_name" : last_name,
@@ -150,7 +150,7 @@ let workspaces = new Vue({
     },
     methods: {
         deleteWorkspace(id, i) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + id + ".json", {
+            fetch("http://206.189.202.188:43554/workspaces/" + id + ".json", {
                 method: "DELETE",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem('token')
@@ -161,7 +161,7 @@ let workspaces = new Vue({
             })
         },
         updateWorkspace(workspace) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + workspace.id, {
+            fetch("http://206.189.202.188:43554/workspaces/" + workspace.id, {
                 body: JSON.stringify(workspace),
                 method: "PUT",
                 headers: {
@@ -174,7 +174,7 @@ let workspaces = new Vue({
             })
         },
         addWorkspace(name){
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/add.json", {
+            fetch("http://206.189.202.188:43554/workspaces/add.json", {
                 body: JSON.stringify({"name": name}),
                 method: "POST",
                 headers: {
@@ -194,7 +194,7 @@ let workspaces = new Vue({
         }
     },
     mounted() {
-        fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces.json", {
+        fetch("http://206.189.202.188:43554/workspaces.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
@@ -244,7 +244,7 @@ let threads = new Vue({
     },
     methods: {
         deleteThread(id, i) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/" + id, {
+            fetch("http://206.189.202.188:43554/threads/" + id, {
                 method: "DELETE"
             })
             .then(() => {
@@ -252,7 +252,7 @@ let threads = new Vue({
             })
         },
         updateThreads(thread) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/" + thread.id, {
+            fetch("http://206.189.202.188:43554/threads/" + thread.id, {
                 body: JSON.stringify(thread),
                 method: "PUT",
                 headers: {
@@ -265,7 +265,7 @@ let threads = new Vue({
             })
         },
         addThread(name){
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/add.json", {
+            fetch("http://206.189.202.188:43554/threads/add.json", {
                 body: JSON.stringify({
                     "name": name,
                     "workspace_id": localStorage.getItem('current_workspace'),
@@ -283,7 +283,7 @@ let threads = new Vue({
             })             
         },
         updateThreadsList(){
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads.json", {
+            fetch("http://206.189.202.188:43554/threads.json", {
                 method: "GET",
                 headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
             })
@@ -302,7 +302,7 @@ let threads = new Vue({
         }
     },
     mounted() {
-        fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads.json", {
+        fetch("http://206.189.202.188:43554/threads.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
@@ -375,7 +375,7 @@ let users = new Vue({
         },
     },
     mounted() {
-        fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/users.json", {
+        fetch("http://206.189.202.188:43554/users.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
@@ -436,7 +436,7 @@ let message = new Vue({
             //const text = event.target.value
            //this.chats.push({text, done: false, id: Date.now()})
             // event.target.value = ''
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/messages/add.json", {
+            fetch("http://206.189.202.188:43554/messages/add.json", {
                 body: JSON.stringify({
                     "body": text,
                     "thread_id": localStorage.getItem('current_thread')
@@ -467,7 +467,7 @@ let message = new Vue({
 
         updateMessageList() {
             document.getElementById('chats').innerHTML = '';
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
+            fetch("http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
                 method: "GET",
                 headers: { "Authorization": "Bearer " + localStorage.getItem('token') },
             })
@@ -482,7 +482,7 @@ let message = new Vue({
 
     },
     mounted() {
-        fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
+        fetch("http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
             method: "GET",
             headers: { "Authorization": "Bearer " + localStorage.getItem('token') },
         })
