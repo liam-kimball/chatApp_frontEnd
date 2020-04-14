@@ -40,7 +40,7 @@ let login = new Vue({
                     //localStorage.removeItem('token');
                 }
                 localStorage.setItem('user_id', this.user_id);
-                localStorage.setItem('user_names', this.username);
+                localStorage.setItem('username', this.username);
             })
             
         }
@@ -440,7 +440,8 @@ let message = new Vue({
             fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/messages/add.json", {
                 body: JSON.stringify({
                     "body": text,
-                    "thread_id": localStorage.getItem('current_thread')
+                    "thread_id": localStorage.getItem('current_thread'),
+                    "username": localStorage.getItem('username'),
                 }),
                 method: "POST",
                 headers: {
@@ -499,14 +500,14 @@ let message = new Vue({
             console.log("Connection established!");
         };
         this.conn.onmessage = function(e) {
-            //console.log(e.data);
+            console.log(e.data);
             var data = JSON.parse(e.data);
             console.log(JSON.stringify(data));
             if(data.thread_id === localStorage.getItem('current_thread')){
                 if(data.from == "Me") {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-info border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-info border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
                 } else {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
                 }
             }
             var temp = document.getElementById('chatsWindow');
@@ -524,14 +525,14 @@ let message = new Vue({
                 <li v-for="chat, i in chats" style="list-style-type:none;">
                     <template v-if="chat.user_id == localStorage.getItem('user_id')">
                         <div class="container bg-info border">
-                            <h6>User Id: {{chat.user_id}}</h6>
+                            <h6>{{chat.username}}:</h6>
                             <p>{{chat.body}}</p>
                             <span class="time-right">{{chat.created}}</span>
                         </div>
                     </template>
                     <template v-else>
                         <div class="container bg-secondary border">
-                            <h6>User Id: {{chat.user_id}}</h6>
+                            <h6>{{chat.username}}:</h6>
                             <p>{{chat.body}}</p>
                             <span class="time-right">{{chat.created}}</span>
                         </div>
