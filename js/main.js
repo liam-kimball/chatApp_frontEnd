@@ -3,7 +3,6 @@ function logout() {
     localStorage.removeItem('current_workspace');
     localStorage.removeItem('current_thread');
     localStorage.removeItem('user_id');
-    localStorage.setItem('display_chat', false);
     location.reload();
 }
 
@@ -161,7 +160,7 @@ let workspaces = new Vue({
             })
         },
         updateWorkspace(workspace) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + workspace.id, {
+            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + workspace.id + ".json", {
                 body: JSON.stringify(workspace),
                 method: "PUT",
                 headers: {
@@ -184,8 +183,8 @@ let workspaces = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                console.log(data);
-                //this.workspaces.push(data.Work_Space);
+                //console.log(data);
+                this.workspaces.push(data.Work_Space);
             })             
         },
         saveCurrentWorkspace(){
@@ -200,7 +199,7 @@ let workspaces = new Vue({
         })
         .then(response => response.json())
         .then((data) => {
-            console.log(data.Workspaces);
+            //console.log(data.Workspaces);
             this.workspaces = data.Workspaces;
         })
     },
@@ -244,7 +243,7 @@ let threads = new Vue({
     },
     methods: {
         deleteThread(id, i) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/" + id, {
+            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/" + id + ".json", {
                 method: "DELETE"
             })
             .then(() => {
@@ -252,7 +251,7 @@ let threads = new Vue({
             })
         },
         updateThreads(thread) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/" + thread.id, {
+            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/" + thread.id + ".json", {
                 body: JSON.stringify(thread),
                 method: "PUT",
                 headers: {
@@ -278,8 +277,8 @@ let threads = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                console.log(data);
-                //this.workspaces.push(data);
+                //console.log(data);
+                this.workspaces.push(data);
             })             
         },
         updateThreadsList(){
@@ -473,7 +472,7 @@ let message = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                console.log(data);
+                //console.log(data);
                 this.chats = data.Messages;     
             });
             var temp = document.getElementById('chatsWindow');
