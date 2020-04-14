@@ -1,3 +1,12 @@
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('current_workspace');
+    localStorage.removeItem('current_thread');
+    localStorage.removeItem('user_id');
+    localStorage.setItem('display_chat', false);
+    location.reload();
+}
+
 let login = new Vue({
     el: "#login",
     data: {
@@ -198,7 +207,7 @@ let workspaces = new Vue({
     template: `
         <div class="container p-3 my-3 border">
             <h4> Workspaces: </h4>
-            <h6> Current workspace: {{ current_workspace }}</h6>
+           <!--<h6> Current workspace: {{ current_workspace }}</h6>-->
             <li v-for="workspace, i in workspaces">
                 <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace(); threads.updateThreadsList();">
                 <div class="container p-3 my-3 border">
@@ -208,11 +217,12 @@ let workspaces = new Vue({
                     
                     </div>
                     <div v-else>
+                        <h6>{{workspace.name}}</h6>
+                        
                         <button v-on:click="editWorkspace = workspace.id">edit</button>
                         <button v-on:click="deleteWorkspace(workspace.id, i)">X</button>
-                        <h4>{{workspace.name}}</h4>
-                        <h5>id: {{workspace.id}}</h5>
-                        <p>owner_id: {{workspace.owner_user_id}}</p>
+                        <!--<h5>id: {{workspace.id}}</h5>-->
+                        <!--<p>owner_id: {{workspace.owner_user_id}}</p>-->
                     </div>
                 </div>
             </li>
@@ -309,7 +319,7 @@ let threads = new Vue({
     template: `
         <div class="container p-3 my-3 border">
             <h4> Threads: </h4>
-            <h6> Current thread: {{ current_thread }}</h6>
+          <!--  <h6> Current thread: {{ current_thread }}</h6> -->
             <li v-for="thread, i in threads">
             <input type="radio" id="{{ thread.id }}" :value="thread.id" v-model="current_thread" v-on:change="saveCurrentThread(); message.updateMessageList();">
                 <div class="container p-3 my-3 border">
@@ -319,11 +329,12 @@ let threads = new Vue({
                     
                     </div>
                     <div v-else>
+                        <h6>{{thread.name}}</h6>
                         <button v-on:click="editThread = thread.id">edit</button>
                         <button v-on:click="deleteThread(thread.id, i)">X</button>
-                        <h4>{{thread.name}}</h4>
-                        <h5>id: {{thread.id}}</h5>
-                        <h6>workspace_id: {{ thread.workspace_id }}</h6>
+                        
+                       <!--<h5>id: {{thread.id}}</h5>-->
+                        <!--<h6>workspace_id: {{ thread.workspace_id }}</h6>-->
                     </div>
                 </div>
             </li>
@@ -405,7 +416,7 @@ let message = new Vue({
     data: {
         welcomeMessage: 'Chat App',
         //chats: chatStorage.fetch(),
-        messageList: [],
+        chats: [],
        
         addChatMessage: '',
         conn: new WebSocket('ws://206.189.202.188:8080'),
@@ -443,7 +454,7 @@ let message = new Vue({
                 this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
                 //this.workspaces.push(data.Work_Space);
                 localStorage.setItem('user_id', data.user_id);
-                this.conn.send(JSON.stringify({"body":text, "user_id":this.user_id, "thread_id":localStorage.getItem('current_thread'), "Username":localStorage.getItem('user_names')}))
+                this.conn.send(JSON.stringify({"body":text, "user_id":this.user_id, "thread_id":localStorage.getItem('current_thread')}))
             })  
             //this.chats = ({message:this.text, id:this.user_id})
             this.addChatMessage = '';
@@ -455,6 +466,7 @@ let message = new Vue({
         },
 
         updateMessageList() {
+            document.getElementById('chats').innerHTML = '';
             fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
                 method: "GET",
                 headers: { "Authorization": "Bearer " + localStorage.getItem('token') },
@@ -462,21 +474,26 @@ let message = new Vue({
             .then(response => response.json())
             .then((data) => {
                 console.log(data);
-                this.messageList = data.Messages;     
-            })  
+                this.chats = data.Messages;     
+            });
+            var temp = document.getElementById('chatsWindow');
+            temp.scrollTop = temp.scrollHeight;  
         }
 
     },
     mounted() {
         fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
-                method: "GET",
-                headers: { "Authorization": "Bearer " + localStorage.getItem('token') },
-            })
-            .then(response => response.json())
-            .then((data) => {
-                console.log(data);
-                this.messageList = data.Messages;     
-            });
+            method: "GET",
+            headers: { "Authorization": "Bearer " + localStorage.getItem('token') },
+        })
+        .then(response => response.json())
+        .then((data) => {
+            console.log(data);
+            this.chats = data.Messages;     
+        });
+        var temp = document.getElementById('chatsWindow');
+        temp.scrollTop = temp.scrollHeight;  
+
         this.conn.onopen = function(e) {
             console.log("Connection established!");
         };
@@ -486,18 +503,13 @@ let message = new Vue({
             console.log(JSON.stringify(data));
             if(data.thread_id === localStorage.getItem('current_thread')){
                 if(data.from == "Me") {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-3 my-3 border">' + '<h6>UserName: ' + data.Username + '  ' + data.user_id + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
                 } else {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-3 my-3 border">' + '<h6>UserName: ' + data.Username + '  ' + data.user_id + '</h6>' + data.body + '<br><small class="small">' + data.created + '</small></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
                 }
-                this.messageList.push({
-                    "body": data.body,
-                    "user_id": data.user_id,
-                    "thread_id": data.thread_id,
-                    "created": data.created,
-                })
             }
-          
+            var temp = document.getElementById('chatsWindow');
+            temp.scrollTop = temp.scrollHeight;           
             
         }
         this.conn.onclose = function(e) {
@@ -505,51 +517,30 @@ let message = new Vue({
         }
     },
     template: `
-    <div class="col-md-8">
-                <div id="messages">
-                    <table id="chats" class="table table-striped">
-                      <thead>
-                        <tr>
-                          <th colspan="4" scope="col"><strong>Chat Room</strong></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                      <li v-for="chat, i in messageList" style="list-style-type:none;">
-                <template v-if="chat.user_id == localStorage.getItem('user_id')">
-                    <div class="container bg-info p-2 border">
-                        <h6>User Id: {{chat.user_id}}</h6>
-                        <p>{{chat.body}}</p>
-                        <small>{{chat.created}}</small>
-                    </div>
-                </template>
-                <template v-else>
-                    <div class="container bg-secondary p-2 border">
-                        <h6>User Id: {{chat.user_id}}</h6>
-                        <p>{{chat.body}}</p>
-                        <small>{{chat.created}}</small>
-                    </div>
-                </template>
-            </li>
-           
-                      <!-- <li v-for="chat, i in chats">
-                      <div>
-                              <h4>{{chat.text}}</h4>
-                          </div>
-                      </div>
-                  </li> -->
-                  
-                      </tbody>
-                    </table>
-                </div>
-                <div class="container p-3 my-3 border">
-           
-            <input v-model="newMessage" v-on:keyup.enter='addChat(newMessage)'/>
-            <small>adding item...{{newMessage}}</small>
-            <div id="chats"></div>
-        </div>  
+        <div class="container p-3 my-3 border">
+            <h4> Messages: </h4>
+            <div id="chatsWindow" class="overflow-auto" style="height: 500px;">
+                <li v-for="chat, i in chats" style="list-style-type:none;">
+                    <template v-if="chat.user_id == localStorage.getItem('user_id')">
+                        <div class="container border">
+                            <h6>User Id: {{chat.user_id}}</h6>
+                            <p>{{chat.body}}</p>
+                            <span class="time-right">{{chat.created}}</span>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div class="container border">
+                            <h6>User Id: {{chat.user_id}}</h6>
+                            <p>{{chat.body}}</p>
+                            <span class="time-right">{{chat.created}}</span>
+                        </div>
+                    </template>
+                </li>
+                <div id="chats"></div>
+                
             </div>
+            <input class="w-75 px-2 my-3" v-model="newMessage" v-on:keyup.enter="addChat(newMessage)"/>
+            <small>adding item...{{newMessage}}</small>
         </div>
-    </div>
-        
     `
 });
