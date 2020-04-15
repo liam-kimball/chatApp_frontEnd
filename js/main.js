@@ -19,7 +19,7 @@ let login = new Vue({
         login(username, password) {
             //console.log(JSON.stringify({"username": username, "password": password}));
             // add proxy url to allow calls from local system, will need to be taken out later
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/users/login.json", {
+            fetch("http://206.189.202.188:43554/users/login.json", {
                 body: JSON.stringify({
                     "username": username,
                     "password": password
@@ -93,7 +93,7 @@ let signUp = new Vue({
     methods: {
         signUp(first_name, last_name, username, email, password) {
             // add proxy url to allow calls from local system, will need to be taken out later
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/users/add.json", {
+            fetch("http://206.189.202.188:43554/users/add.json", {
                 body: JSON.stringify({
                     "first_name" : first_name,
                     "last_name" : last_name,
@@ -173,7 +173,7 @@ let workspaces = new Vue({
             })
         },
         addWorkspace(name){
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/add.json", {
+            fetch("http://206.189.202.188:43554/workspaces/add.json", {
                 body: JSON.stringify({"name": name}),
                 method: "POST",
                 headers: {
@@ -184,7 +184,7 @@ let workspaces = new Vue({
             .then(response => response.json())
             .then((data) => {
                 //console.log(data);
-                this.workspaces.push(data.Work_Space);
+                this.workspaces.push(data["Work Space"]);
             })             
         },
         saveCurrentWorkspace(){
@@ -193,13 +193,13 @@ let workspaces = new Vue({
         }
     },
     mounted() {
-        fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces.json", {
+        fetch("http://206.189.202.188:43554/workspaces.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
         .then(response => response.json())
         .then((data) => {
-            //console.log(data.Workspaces);
+            console.log(data.Workspaces);
             this.workspaces = data.Workspaces;
         })
     },
@@ -207,28 +207,55 @@ let workspaces = new Vue({
         <div class="container p-3 my-3 border">
             <h4> Workspaces: </h4>
            <!--<h6> Current workspace: {{ current_workspace }}</h6>-->
-            <li v-for="workspace, i in workspaces">
-                <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace(); threads.updateThreadsList();">
-                <div class="container p-3 my-3 border">
-                    <div v-if="editWorkspace === workspace.id">
-                        <input v-on:keyup.enter="updateWorkspace(workspace)" v-model="workspace.name" />
-                        <button v-on:click="updateWorkspace(workspace)">save</button>
-                    
-                    </div>
-                    <div v-else>
-                        <h6>{{workspace.name}}</h6>
-                        
-                        <button v-on:click="editWorkspace = workspace.id">edit</button>
-                        <button v-on:click="deleteWorkspace(workspace.id, i)">X</button>
-                        <!--<h5>id: {{workspace.id}}</h5>-->
-                        <!--<p>owner_id: {{workspace.owner_user_id}}</p>-->
-                    </div>
-                </div>
+            <li v-for="workspace, i in workspaces" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
+                <template v-if="localStorage.getItem('current_workspace') == workspace.id">
+                    <label class="btn btn-dark active">
+                        <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace(); threads.updateThreadsList();">
+                        <div class="container text-left">
+                            <div v-if="editWorkspace === workspace.id">
+                                <input v-on:keyup.enter="updateWorkspace(workspace)" v-model="workspace.name" />
+                                <button v-on:click="updateWorkspace(workspace)">save</button>
+                            </div>
+                            <div v-else>
+                                <h6>{{workspace.name}}</h6>
+                                <template v-if="workspace.owner_user_id == localStorage.getItem('user_id')">
+                                    <button v-on:click="editWorkspace = workspace.id">edit</button>
+                                    <button v-on:click="deleteWorkspace(workspace.id, i)">X</button>
+                                </template>
+                            <!--<h5>id: {{workspace.id}}</h5>-->
+                            <!--<p>owner_id: {{workspace.owner_user_id}}</p>-->
+                            </div>
+                        </div>
+                    </label>
+                </template>
+                <template v-else>
+                    <label class="btn btn-primary">
+                        <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace(); threads.updateThreadsList();">
+                        <div class="container text-left">
+                            <div v-if="editWorkspace === workspace.id">
+                                <input v-on:keyup.enter="updateWorkspace(workspace)" v-model="workspace.name" />
+                                <button v-on:click="updateWorkspace(workspace)">save</button>
+                            </div>
+                            <div v-else>
+                                <h6>{{workspace.name}}</h6>
+                                <template v-if="workspace.owner_user_id == localStorage.getItem('user_id')">
+                                    <button v-on:click="editWorkspace = workspace.id">edit</button>
+                                    <button v-on:click="deleteWorkspace(workspace.id, i)">X</button>
+                                </template>
+                                <!--<h5>id: {{workspace.id}}</h5>-->
+                                <!--<p>owner_id: {{workspace.owner_user_id}}</p>-->
+                            </div>
+                        </div>
+                    </label>
+                </template>
             </li>
             <h5>Create a new workspace:</h5>
-            <input v-model="newWorkspace" v-on:keyup.enter='addWorkspace(newWorkspace)'/>
-            <button v-on:click="addWorkspace(newWorkspace)">Add</button>
-            <small>adding item...{{newWorkspace}}</small>
+            <div class="input-group">
+                <input class="form-control" v-model="newWorkspace" v-on:keyup.enter='addWorkspace(newWorkspace)'/>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-dark" v-on:click="addWorkspace(newWorkspace)">Add</button>
+                </div>            
+            </div>
         </div>
     `
 });
@@ -244,7 +271,7 @@ let threads = new Vue({
     },
     methods: {
         deleteThread(id, i) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/" + id + ".json", {
+            fetch("http://206.189.202.188:43554/threads/" + id + ".json", {
                 method: "DELETE"
             })
             .then(() => {
@@ -252,7 +279,7 @@ let threads = new Vue({
             })
         },
         updateThreads(thread) {
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/" + thread.id + ".json", {
+            fetch("http://206.189.202.188:43554/threads/" + thread.id + ".json", {
                 body: JSON.stringify(thread),
                 method: "PUT",
                 headers: {
@@ -265,7 +292,7 @@ let threads = new Vue({
             })
         },
         addThread(name){
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads/add.json", {
+            fetch("http://206.189.202.188:43554/threads/add.json", {
                 body: JSON.stringify({
                     "name": name,
                     "workspace_id": localStorage.getItem('current_workspace'),
@@ -279,11 +306,11 @@ let threads = new Vue({
             .then(response => response.json())
             .then((data) => {
                 //console.log(data);
-                this.workspaces.push(data);
+                this.threads.push(data["New Thread"]);
             })             
         },
         updateThreadsList(){
-            fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads.json", {
+            fetch("http://206.189.202.188:43554/threads.json", {
                 method: "GET",
                 headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
             })
@@ -302,7 +329,7 @@ let threads = new Vue({
         }
     },
     mounted() {
-        fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/threads.json", {
+        fetch("http://206.189.202.188:43554/threads.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
@@ -320,28 +347,59 @@ let threads = new Vue({
         <div class="container p-3 my-3 border">
             <h4> Threads: </h4>
           <!--  <h6> Current thread: {{ current_thread }}</h6> -->
-            <li v-for="thread, i in threads">
-            <input type="radio" id="{{ thread.id }}" :value="thread.id" v-model="current_thread" v-on:change="saveCurrentThread(); message.updateMessageList();">
-                <div class="container p-3 my-3 border">
-                    <div v-if="editThread === thread.id">
-                        <input v-on:keyup.enter="updateThread(thread)" v-model="thread.name" />
-                        <button v-on:click="updateThread(thread)">save</button>
-                    
-                    </div>
-                    <div v-else>
-                        <h6>{{thread.name}}</h6>
-                        <button v-on:click="editThread = thread.id">edit</button>
-                        <button v-on:click="deleteThread(thread.id, i)">X</button>
-                        
-                       <!--<h5>id: {{thread.id}}</h5>-->
-                        <!--<h6>workspace_id: {{ thread.workspace_id }}</h6>-->
-                    </div>
-                </div>
+            <li v-for="thread, i in threads" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
+                <template v-if="localStorage.getItem('current_thread') == thread.id">
+                    <label class="btn btn-light active">
+                        <input type="radio" id="{{ thread.id }}" :value="thread.id" v-model="current_thread" v-on:change="saveCurrentThread(); message.updateMessageList();">
+                        <div class="container text-left">
+                            <div v-if="editThread === thread.id">
+                                <input v-on:keyup.enter="updateThreads(thread)" v-model="thread.name" />
+                                <button v-on:click="updateThreads(thread)">save</button>
+                            
+                            </div>
+                            <div v-else>
+                                <h6>{{thread.name}}</h6>
+                                <!-- 
+                                <button v-on:click="editThread = thread.id">edit</button>
+                                <button v-on:click="deleteThread(thread.id, i)">X</button>
+                                -->
+                                
+                            <!--<h5>id: {{thread.id}}</h5>-->
+                                <!--<h6>workspace_id: {{ thread.workspace_id }}</h6>-->
+                            </div>
+                        </div>
+                    </label>
+                </template>
+                <template v-else>
+                    <label class="btn btn-warning">
+                        <input type="radio" id="{{ thread.id }}" :value="thread.id" v-model="current_thread" v-on:change="saveCurrentThread(); message.updateMessageList();">
+                        <div class="container text-left">
+                            <div v-if="editThread === thread.id">
+                                <input v-on:keyup.enter="updateThreads(thread)" v-model="thread.name" />
+                                <button v-on:click="updateThreads(thread)">save</button>
+                            
+                            </div>
+                            <div v-else>
+                                <h6>{{thread.name}}</h6>
+                                <!-- 
+                                <button v-on:click="editThread = thread.id">edit</button>
+                                <button v-on:click="deleteThread(thread.id, i)">X</button>
+                                -->
+                                
+                            <!--<h5>id: {{thread.id}}</h5>-->
+                                <!--<h6>workspace_id: {{ thread.workspace_id }}</h6>-->
+                            </div>
+                        </div>
+                    </label>
+                </template>
             </li>
             <h5>Create a new thread:</h5>
-            <input v-model="newThread" v-on:keyup.enter='addThread(newThread)'/>
-            <button v-on:click="addThread(newThread)">Add</button>
-            <small>adding item...{{newThread}}</small>
+            <div class="input-group">
+                <input class="form-control" v-model="newThread" v-on:keyup.enter='addThread(newThread)'/>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-light" v-on:click="addThread(newThread)">Add</button>
+                </div>            
+            </div>
         </div>
     `
 });
@@ -376,13 +434,13 @@ let users = new Vue({
         },
     },
     mounted() {
-        fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/users.json", {
+        fetch("http://206.189.202.188:43554/users.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
         .then(response => response.json())
         .then((data) => {
-            console.log(data.users);
+            //console.log(data.users);
             this.users = data.users;
         })
     },
@@ -455,7 +513,7 @@ let message = new Vue({
                 this.token = localStorage.getItem('token');
                 this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
                 //this.workspaces.push(data.Work_Space);
-                localStorage.setItem('user_id', data.user_id);
+                //localStorage.setItem('user_id', data.user_id);
                 this.conn.send(JSON.stringify({
                     "body": text, 
                     "user_id": this.user_id, 
@@ -495,7 +553,7 @@ let message = new Vue({
         })
         .then(response => response.json())
         .then((data) => {
-            console.log(data);
+            //console.log(data);
             this.chats = data.Messages;     
         });
         var temp = document.getElementById('chatsWindow');
@@ -516,7 +574,7 @@ let message = new Vue({
                 }
             }
             var temp = document.getElementById('chatsWindow');
-            temp.scrollTop = temp.scrollHeight;           
+            temp.scrollTop = temp.scrollHeight;          
             
         }
         this.conn.onclose = function(e) {
@@ -524,9 +582,9 @@ let message = new Vue({
         }
     },
     template: `
-        <div class="container p-3 my-3 border">
+        <div class="container p-3 my-3 border rounded">
             <h4> Messages: </h4>
-            <div id="chatsWindow" class="overflow-auto" style="height: 500px;">
+            <div id="chatsWindow" class="overflow-auto border rounded p-1" style="height: 600px;">
                 <li v-for="chat, i in chats" style="list-style-type:none;">
                     <template v-if="chat.user_id == localStorage.getItem('user_id')">
                         <div class="container bg-info p-2 my-1 border">
@@ -546,8 +604,12 @@ let message = new Vue({
                 <div id="chats"></div>
                 
             </div>
-            <input class="w-75 px-2 my-3" v-model="newMessage" v-on:keyup.enter="addChat(newMessage)"/>
-            <small>adding item...{{newMessage}}</small>
+            <div class="input-group w-100 my-3">
+                <input class="form-control" v-model="newMessage" v-on:keyup.enter="addChat(newMessage)"/>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-light" v-on:click="addChat(newMessage)">Send</button>
+                </div> 
+
         </div>
     `
 });

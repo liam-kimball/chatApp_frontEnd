@@ -109,7 +109,10 @@ h1.welcome {
     
   
   /* side nav bar */
-  
+  .workspace-btn {
+    width: 200px;
+  }
+
   .space {
       flex-grow: 1;
     }
