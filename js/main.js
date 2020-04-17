@@ -41,7 +41,7 @@ let login = new Vue({
                     //localStorage.removeItem('token');
                 }
                 localStorage.setItem('user_id', this.user_id);
-                localStorage.setItem('user_names', this.username);
+                localStorage.setItem('username', this.username);
             })
             
         }
@@ -439,7 +439,8 @@ let message = new Vue({
             fetch("http://206.189.202.188:43554/messages/add.json", {
                 body: JSON.stringify({
                     "body": text,
-                    "thread_id": localStorage.getItem('current_thread')
+                    "thread_id": localStorage.getItem('current_thread'),
+                    "username": localStorage.getItem('username'),
                 }),
                 method: "POST",
                 headers: {
@@ -454,7 +455,12 @@ let message = new Vue({
                 this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
                 //this.workspaces.push(data.Work_Space);
                 localStorage.setItem('user_id', data.user_id);
-                this.conn.send(JSON.stringify({"body":text, "user_id":this.user_id, "thread_id":localStorage.getItem('current_thread')}))
+                this.conn.send(JSON.stringify({
+                    "body": text, 
+                    "user_id": this.user_id, 
+                    "thread_id": localStorage.getItem('current_thread'), 
+                    "username": localStorage.getItem('username'),
+                }))
             })  
             //this.chats = ({message:this.text, id:this.user_id})
             this.addChatMessage = '';
@@ -473,7 +479,7 @@ let message = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                console.log(data);
+                //console.log(data);
                 this.chats = data.Messages;     
             });
             var temp = document.getElementById('chatsWindow');
@@ -503,9 +509,9 @@ let message = new Vue({
             console.log(JSON.stringify(data));
             if(data.thread_id === localStorage.getItem('current_thread')){
                 if(data.from == "Me") {
-                    document.getElementById("chats").innerHTML += '<div class="container border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
                 } else {
-                    document.getElementById("chats").innerHTML += '<div class="container border">' + '<h6>User Id: ' + data.user_id + '</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
                 }
             }
             var temp = document.getElementById('chatsWindow');
@@ -522,15 +528,15 @@ let message = new Vue({
             <div id="chatsWindow" class="overflow-auto" style="height: 500px;">
                 <li v-for="chat, i in chats" style="list-style-type:none;">
                     <template v-if="chat.user_id == localStorage.getItem('user_id')">
-                        <div class="container border">
-                            <h6>User Id: {{chat.user_id}}</h6>
+                        <div class="container bg-info p-2 my-1 border">
+                            <h6>{{chat.username}}:</h6>
                             <p>{{chat.body}}</p>
                             <span class="time-right">{{chat.created}}</span>
                         </div>
                     </template>
                     <template v-else>
-                        <div class="container border">
-                            <h6>User Id: {{chat.user_id}}</h6>
+                        <div class="container bg-secondary p-2 my-1 border">
+                            <h6>{{chat.username}}:</h6>
                             <p>{{chat.body}}</p>
                             <span class="time-right">{{chat.created}}</span>
                         </div>
