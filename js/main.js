@@ -1,9 +1,42 @@
+let topnav = new Vue({
+    el: "#topnav",
+    data: {
+        username: '',
+        token: '',
+       
+    },
+
+    methods: {
+        updateUser() {
+            this.token = localStorage.getItem('token');
+        }
+    },
+    mounted() {
+
+    },
+
+    template: `
+    <div>
+    <a> <h6>ChatApp</h6></a>
+    <a v-if="localStorage.getItem('token') == null" href="index.html">Login</a>
+    <a v-if="localStorage.getItem('token') == null" href="signup.html">Signup</a>
+    <a  v-if="localStorage.getItem('token') != null" href="channels.html">Channel</a>
+    <a  v-if="localStorage.getItem('token') != null" href="users.html">Users</a>
+    <a  v-if="localStorage.getItem('token') != null" href="dms.html">Direct Messages</a>
+    <a v-if="localStorage.getItem('token') != null" onclick="logout()">Logout</a>
+  </div>
+    
+    `
+});
+
+
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('current_workspace');
     localStorage.removeItem('current_thread');
     localStorage.removeItem('user_id');
     location.reload();
+    location.replace("/index.html")
 }
 
 let login = new Vue({
@@ -41,6 +74,7 @@ let login = new Vue({
                 }
                 localStorage.setItem('user_id', this.user_id);
                 localStorage.setItem('username', this.username);
+                location.replace("/channels.html")
             })
             
         }
@@ -65,16 +99,20 @@ let login = new Vue({
     },
 
     template: `
-        <div class="container p-5 my-5 border"> 
-            <h1>Login</h1>
-            <input type="text" name="username" v-model="username" placeholder="Username" />
-            <input type="password" name="password" v-model="password" placeholder="Password" />
-            <button type="button" v-on:click="login(username, password)">Login</button>
-            <h5>Token: {{token}}</h5>
-            <h5>User ID: {{ user_id }}
-            <br><br>
+      
+        <div id="loginbox">
+    <h1>ChatApp Login</h1>
+         <div class="form-group col-lg-9">
+         <input class="form-control" type="text" name="username" v-model="username" placeholder="Username" />
+         </div>
+        <div class="form-group col-lg-9">
+         <input class="form-control" type="password" name="password" v-model="password" placeholder="Password" />
         </div>
-    
+        <div>
+    <div id="log-btndiv">
+    <button class="btn btn-outline-light btn-lg " type="button" v-on:click="login(username, password)">Login</button>
+    </div>
+   </div>
     `
 });
 
@@ -112,10 +150,12 @@ let signUp = new Vue({
                 localStorage.setItem('token', data.data.token);
                 try {
                     this.token = localStorage.getItem('token');
+                    
                 } catch(e) {
                     console.log('Cant find token');
                     //localStorage.removeItem('token');
                 }
+                location.replace("/channels.html")
             })
             
         }
@@ -123,17 +163,30 @@ let signUp = new Vue({
 
 
     template: `
-        <div class="container p-5 my-5 border"> 
-            <h2>Create an account</h2>
-            <input type="text" name="first_name" v-model="first_name" placeholder="First name" />
-            <input type="text" name="last_name" v-model="last_name" placeholder="Last name" />
-            <input type="text" name="username" v-model="username" placeholder="Username" />
-            <input type="text" name="email" v-model="email" placeholder="Email" />
-            <input type="password" name="password" v-model="password" placeholder="Password" />
-            <button type="button" v-on:click="signUp(first_name, last_name, username, email, password)">Create</button>
-            <h5>Token: {{token}}</h5>
-            <br><br>
+       
+        <div id="signUpbox">
+     <h1>ChatApp Sign Up</h1>
+        <div class="form-group col-lg-9">
+            <input class="form-control" type="text" name="first_name" v-model="first_name" placeholder="First name" />
         </div>
+        <div class="form-group col-lg-9">
+            <input class="form-control" type="text" name="last_name" v-model="last_name" placeholder="Last name" />
+        </div>
+        <div class="form-group col-lg-9">
+            <input class="form-control" type="text" name="username" v-model="username" placeholder="Username" />
+        </div>
+        <div class="form-group col-lg-9">
+            <input class="form-control" type="text" name="email" v-model="email" placeholder="Email" />
+        </div>
+        <div class="form-group col-lg-9">
+            <input class="form-control" type="password" name="password" v-model="password" placeholder="Password" />
+        </div>
+        <div>
+ <div id="log-btndiv">
+ <button class="btn btn-outline-light btn-lg " type="button" v-on:click="signUp(first_name, last_name, username, email, password)">Create</button>
+ </div>
+  </form>
+</div>
     
     `
 });
@@ -476,7 +529,6 @@ let message = new Vue({
         welcomeMessage: 'Chat App',
         //chats: chatStorage.fetch(),
         chats: [],
-       
         addChatMessage: '',
         conn: new WebSocket('ws://206.189.202.188:8080'),
         newMessage: ''

@@ -119,7 +119,7 @@ h1.welcome {
   
     .sidebar {
         width: 200px;
-        background-color: #f1f1f1;
+        background-color: #f2f2f2;
         position: fixed;
         height: 100%;
         z-index: 1;
@@ -210,12 +210,16 @@ h1.welcome {
       .mains {
         margin-left: 165px;
     }
-
+    .secondary{
+      margin-left: 165px;
+      background-color:  rgb(40, 45, 51);
+      ;
+  }
       .bg-secondary{
           margin-left: 165px;
           background-color: white;
       }
-
+      
       .body{
         margin-left: 165px;
     }
@@ -245,8 +249,9 @@ h1.welcome {
       
       .time-right {
         float: right;
-        color: #aaa;
+        color: rgb(247, 240, 240);
       }
+      
       
       
   /* .sidenav {
