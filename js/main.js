@@ -246,13 +246,14 @@ let workspaces = new Vue({
         }
     },
     mounted() {
+        localStorage.setItem('current_thread', null);
         fetch("http://206.189.202.188:43554/workspaces.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
         .then(response => response.json())
         .then((data) => {
-            console.log(data.Workspaces);
+            //console.log(data.Workspaces);
             this.workspaces = data.Workspaces;
         })
     },
@@ -390,7 +391,9 @@ let threads = new Vue({
         .then((data) => {
             //console.log(data.Threads);
             var filtered = (data.Threads).filter(function (entry) {
-                return JSON.stringify(entry.workspace_id) === localStorage.getItem('current_workspace');
+                if(localStorage.getItem('current_workspace') != "null"){
+                    return JSON.stringify(entry.workspace_id) === localStorage.getItem('current_workspace');
+                }
             });
             //console.log(filtered);
             this.threads = filtered;
@@ -547,35 +550,39 @@ let message = new Vue({
             //const text = event.target.value
            //this.chats.push({text, done: false, id: Date.now()})
             // event.target.value = ''
-            fetch("http://206.189.202.188:43554/messages/add.json", {
-                body: JSON.stringify({
-                    "body": text,
-                    "thread_id": localStorage.getItem('current_thread'),
-                    "username": localStorage.getItem('username'),
-                }),
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + localStorage.getItem('token')
-                },
-            })
-            .then(response => response.json())
-            .then((data) => {
-                console.log(data);
-                this.token = localStorage.getItem('token');
-                this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
-                //this.workspaces.push(data.Work_Space);
-                //localStorage.setItem('user_id', data.user_id);
-                this.conn.send(JSON.stringify({
-                    "body": text, 
-                    "user_id": this.user_id, 
-                    "thread_id": localStorage.getItem('current_thread'), 
-                    "username": localStorage.getItem('username'),
-                }))
-            })  
-            //this.chats = ({message:this.text, id:this.user_id})
-            this.addChatMessage = '';
-            this.newMessage = ''
+            if(localStorage.getItem('current_thread') == "null"){
+                alert("Select a thread to send message to");
+            } else {
+                fetch("http://206.189.202.188:43554/messages/add.json", {
+                    body: JSON.stringify({
+                        "body": text,
+                        "thread_id": localStorage.getItem('current_thread'),
+                        "username": localStorage.getItem('username'),
+                    }),
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + localStorage.getItem('token')
+                    },
+                })
+                .then(response => response.json())
+                .then((data) => {
+                    console.log(data);
+                    this.token = localStorage.getItem('token');
+                    this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
+                    //this.workspaces.push(data.Work_Space);
+                    //localStorage.setItem('user_id', data.user_id);
+                    this.conn.send(JSON.stringify({
+                        "body": text, 
+                        "user_id": this.user_id, 
+                        "thread_id": localStorage.getItem('current_thread'), 
+                        "username": localStorage.getItem('username'),
+                    }))
+                })  
+                //this.chats = ({message:this.text, id:this.user_id})
+                this.addChatMessage = '';
+                this.newMessage = '';
+            }
         },
 
         removeChat(id) {
@@ -662,6 +669,155 @@ let message = new Vue({
                     <button class="btn btn-outline-light" v-on:click="addChat(newMessage)">Send</button>
                 </div> 
 
+        </div>
+    `
+});
+
+
+let DMSusers = new Vue({
+    el: "#DMSusers",
+    data: {
+        title: 'Current users',
+        editUser: null,
+        users: [],
+        threadsUsers: [],
+        selected_user: '',
+        current_thread: '',
+    },
+    methods: {
+        addThread(){
+            fetch("http://206.189.202.188:43554/threads/add.json", {
+                body: JSON.stringify({
+                    "name": '',
+                }),
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem('token')
+                },
+            })
+            .then(response => response.json())
+            .then((data) => {
+                //console.log(data);
+                //this.threads.push(data["New Thread"]);
+                //console.log(data["New Thread"].id);
+                localStorage.setItem('current_thread', data["New Thread"].id);
+                this.current_thread = data["New Thread"].id;
+                fetch("http://206.189.202.188:43554/threadsUsers/add.json", {
+                    body: JSON.stringify({
+                        "thread_id": this.current_thread,
+                        "user_id": this.selected_user,
+                    }),
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + localStorage.getItem('token')
+                    },
+                })
+                .then(response => response.json())
+                .then((data) => {
+                    //console.log(data);
+                    //this.threadsUsers.push(data["New Thread"]);
+                    //console.log(this.threadsUsers)
+                });
+                fetch("http://206.189.202.188:43554/threadsUsers/add.json", {
+                    body: JSON.stringify({
+                        "user_id": localStorage.getItem('user_id'),
+                        "thread_id": this.current_thread,
+                    }),
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + localStorage.getItem('token')
+                    },
+                })
+                .then(response => response.json())
+                .then((data) => {
+                   //console.log(data);
+                   this.threadsUsers.push(data["New Thread"]);
+                   //console.log(this.threadsUsers)
+                });
+            });   
+            
+        },    
+        saveSelectedUser(){
+            localStorage.setItem('current_thread', null);
+            //console.log(this.threadsUsers);
+            //console.log(this.selected_user);
+            for( x in this.threadsUsers){
+                if( this.threadsUsers[x].user_id == this.selected_user){
+                    localStorage.setItem('current_thread', this.threadsUsers[x].thread_id);
+                    break;
+                }
+            }
+            if(localStorage.getItem('current_thread') == "null"){
+                //console.log("adding a new thread");
+                this.addThread();
+            }
+        },
+    },
+    mounted() {
+        localStorage.setItem('current_workspace', null);
+        localStorage.setItem('current_thread', null);
+        fetch("http://206.189.202.188:43554/users/indexs.json", {
+            method: "GET",    
+            headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+        })
+        .then(response => response.json())
+        .then((data) => {
+            //console.log(data.users);
+            var filtered = (data.users).filter(function (entry) {
+                return JSON.stringify(entry.id) != localStorage.getItem('user_id');
+            });
+            this.users = filtered;
+        });
+        fetch("http://206.189.202.188:43554/threadsUsers.json", {
+            method: "GET",    
+            headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+        })
+        .then(response => response.json())
+        .then((data) => {
+            //console.log(data["Threads_Users"]);
+            var filtered = (data["Threads_Users"]).filter(function (entry) {
+                return JSON.stringify(entry.user_id) == localStorage.getItem('user_id');
+            });
+            //this.threadsUsers = filtered;
+            for( x in filtered){
+                var y = filtered[x].thread_id;
+                for( z in data["Threads_Users"]){
+                    if(y == data["Threads_Users"][z].thread_id){
+                        if(localStorage.getItem('user_id') != data["Threads_Users"][z].user_id) {
+                            this.threadsUsers.push(data["Threads_Users"][z]);
+                        }
+                    }
+                }
+            }
+            //console.log(this.threadsUsers);
+        });
+    },
+    template: `
+        <div class="container p-3 my-3 border">
+            <h4>{{ title }}</h4>
+            <li v-for="user, i in users" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
+                <template v-if="selected_user == user.id">
+                    <label class="btn btn-light active">
+                        <input type="radio" id="{{ user.id }}" :value="user.id" v-model="selected_user" v-on:change="saveSelectedUser(); message.updateMessageList();">
+                        <div class="container text-left">
+                            <h6>username: </h6><h4>{{user.username}}</h4>
+                            <h6>user_id: {{user.id}}</h6>
+                        </div>
+                    </label>
+                </template>
+                <template v-else>
+                    <label class="btn btn-warning">
+                        <input type="radio" id="{{ user.id }}" :value="user.id" v-model="selected_user" v-on:change="saveSelectedUser(); message.updateMessageList();">
+                        <div class="container text-left">
+                            <h6>username: </h6><h4>{{user.username}}</h4>
+                            <h6>user_id: {{user.id}}</h6>
+                        </div>
+                    </label>
+                </template>
+            </li>    
         </div>
     `
 });
