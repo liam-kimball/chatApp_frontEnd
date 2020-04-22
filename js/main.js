@@ -110,7 +110,7 @@ let login = new Vue({
         </div>
         <div>
     <div id="log-btndiv">
-    <button class="btn btn-outline-light btn-lg " type="button" v-on:click="login(username, password)">Login</button>
+    <button class="btn btn-outline-light btn-lg " type="button" v-on:click="login(username, password)" >Login</button>
     </div>
    </div>
     `
@@ -687,9 +687,9 @@ let message = new Vue({
             console.log(JSON.stringify(data));
             if(data.thread_id === localStorage.getItem('current_thread')){
                 if(data.from == "Me") {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + Date(data.created) + '</span></div>';
                 } else {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + data.created + '</span></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + Date(data.created)+ '</span></div>';
                 }
             }
             var temp = document.getElementById('chatsWindow');
@@ -709,14 +709,14 @@ let message = new Vue({
                         <div class="container bg-info p-2 my-1 border">
                             <h6>{{chat.username}}:</h6>
                             <p>{{chat.body}}</p>
-                            <span class="time-right">{{chat.created}}</span>
+                            <span class="time-right">{{new Date(Date.parse(chat.created))}}</span>
                         </div>
                     </template>
                     <template v-else>
                         <div class="container bg-secondary p-2 my-1 border">
                             <h6>{{chat.username}}:</h6>
                             <p>{{chat.body}}</p>
-                            <span class="time-right">{{chat.created}}</span>
+                            <span class="time-right">{{new Date(Date.parse(chat.created))}}</span>
                         </div>
                     </template>
                 </li>
@@ -758,7 +758,7 @@ let DMSusers = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                //console.log(data);
+                console.log(data);
                 //this.threads.push(data["New Thread"]);
                 //console.log(data["New Thread"].id);
                 localStorage.setItem('current_thread', data["New Thread"].id);
@@ -816,6 +816,7 @@ let DMSusers = new Vue({
                 //console.log("adding a new thread");
                 this.addThread();
             }
+           
         },
     },
     mounted() {
@@ -846,6 +847,8 @@ let DMSusers = new Vue({
     template: `
         <div class="container p-3 my-3 border">
             <h4>{{ title }}</h4>
+           
+           
             <li v-for="user, i in users" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
                 <template v-if="selected_user == user.id">
                     <label class="btn btn-light active">
@@ -865,7 +868,9 @@ let DMSusers = new Vue({
                         </div>
                     </label>
                 </template>
-            </li>    
+            </li> 
+        
+               
         </div>
     `
 });
