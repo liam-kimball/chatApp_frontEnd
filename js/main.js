@@ -106,7 +106,7 @@ let login = new Vue({
          <input class="form-control" type="text" name="username" v-model="username" placeholder="Username" />
          </div>
         <div class="form-group col-lg-9">
-         <input class="form-control" type="password" name="password" v-model="password" placeholder="Password" />
+         <input class="form-control" type="password" name="password" v-model="password" placeholder="Password" v-on:keyup.enter="login(username, password)"/>
         </div>
         <div>
     <div id="log-btndiv">
@@ -197,8 +197,10 @@ let workspaces = new Vue({
         title: 'Name of current workspaces',
         editWorkspace: null,
         workspaces: [],
+        workspaceUsers: [],
         newWorkspace: '',
         current_workspace: null,
+        joinWorkspaceID: '',
     },
     methods: {
         deleteWorkspace(id, i) {
@@ -243,12 +245,10 @@ let workspaces = new Vue({
         saveCurrentWorkspace(){
             localStorage.setItem('current_workspace', this.current_workspace);
             localStorage.setItem('current_thread', null)
-        }
-    },
-    mounted() {
-        localStorage.setItem('current_thread', null);
-        fetch("http://206.189.202.188:43554/workspaces.json", {
-            method: "GET",    
+        },
+        joinWorkspace(){
+            fetch("http://206.189.202.188:43554/workspacesUsers/.json", {
+            method: "POST",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
         .then(response => response.json())
@@ -256,6 +256,41 @@ let workspaces = new Vue({
             //console.log(data.Workspaces);
             this.workspaces = data.Workspaces;
         })
+        }
+    },
+    mounted() {
+        localStorage.setItem('current_thread', null);
+        fetch("http://206.189.202.188:43554/workspaceUsers/index/" + localStorage.getItem('user_id') + ".json", {
+            method: "GET",    
+            headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+        })
+        .then(response => response.json())
+        .then((data) => {
+            //console.log(data);
+            console.log(data.WorkSpaces);
+            workspaceUsers = data.WorkSpaces;
+            //this.workspaces = data.Workspaces;
+        });
+        fetch("http://206.189.202.188:43554/workspaces.json", {
+            method: "GET",    
+            headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+        })
+        .then(response => response.json())
+        .then((data) => {
+            //console.log(data.Workspaces);
+            //console.log(workspaceUsers);
+            for( x in workspaceUsers){
+                var filtered = (data.Workspaces).filter(function (entry) {
+                    //console.log(entry.id);
+                    //console.log(workspaceUsers[x].workspace_id);
+                    return entry.id === workspaceUsers[x].workspace_id;
+                });
+                this.workspaces.push(filtered[0]);
+            }
+            console.log(this.workspaces);
+            //this.workspaces = data.Workspaces;
+            
+        });
     },
     template: `
         <div class="container p-3 my-3 border">
@@ -303,12 +338,27 @@ let workspaces = new Vue({
                     </label>
                 </template>
             </li>
-            <h5>Create a new workspace:</h5>
-            <div class="input-group">
-                <input class="form-control" v-model="newWorkspace" v-on:keyup.enter='addWorkspace(newWorkspace)'/>
-                <div class="input-group-append">
-                    <button class="btn btn-outline-dark" v-on:click="addWorkspace(newWorkspace)">Add</button>
-                </div>            
+            <div>
+                <h5>Join a Workspace:</h5>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">#</span> 
+                    </div>
+                    <input class="form-control" v-model="joinWorkspaceID" v-on:keyup.enter='joinWorkspace()'/>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-dark" v-on:click="joinWorkspace()">Join</button>
+                    </div>            
+                </div>
+                <small>enter a workspace ID #</small>
+            </div><br><br>
+            <div>
+                <h5>Create a new workspace:</h5>
+                <div class="input-group">
+                    <input class="form-control" v-model="newWorkspace" v-on:keyup.enter='addWorkspace(newWorkspace)'/>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-dark" v-on:click="addWorkspace(newWorkspace)">Add</button>
+                    </div>            
+                </div>
             </div>
         </div>
     `
@@ -322,6 +372,7 @@ let threads = new Vue({
         threads: [],
         newThread: '',
         current_thread: null,
+        threadsUsers: [],
     },
     methods: {
         deleteThread(id, i) {
@@ -398,6 +449,15 @@ let threads = new Vue({
             //console.log(filtered);
             this.threads = filtered;
         })
+        fetch("http://206.189.202.188:43554/threadsUsers/index/" + localStorage.getItem('user_id') + ".json", {
+            method: "GET",    
+            headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+        })
+        .then(response => response.json())
+        .then((data) => {
+            //console.log(data["Threads_Users"]);
+            threadsUsers = data["Threads_Users"];
+        });
     },
     template: `
         <div class="container p-3 my-3 border">
@@ -533,7 +593,7 @@ let message = new Vue({
         //chats: chatStorage.fetch(),
         chats: [],
         addChatMessage: '',
-        conn: new WebSocket('ws://206.189.202.188:8080'),
+        conn: new WebSocket('ws://206.189.202.188:8080?token=' + localStorage.getItem('token')),
         newMessage: ''
     },
 
@@ -716,8 +776,8 @@ let DMSusers = new Vue({
                 })
                 .then(response => response.json())
                 .then((data) => {
-                    //console.log(data);
-                    //this.threadsUsers.push(data["New Thread"]);
+                    console.log(data);
+                    threadsUsers.push(data["New Thread"]);
                     //console.log(this.threadsUsers)
                 });
                 fetch("http://206.189.202.188:43554/threadsUsers/add.json", {
@@ -734,19 +794,21 @@ let DMSusers = new Vue({
                 .then(response => response.json())
                 .then((data) => {
                    //console.log(data);
-                   this.threadsUsers.push(data["New Thread"]);
-                   //console.log(this.threadsUsers)
+                   threadsUsers.push(data["New Thread"]);
+                   //console.log(threadsUsers)
                 });
             });   
             
         },    
         saveSelectedUser(){
             localStorage.setItem('current_thread', null);
-            //console.log(this.threadsUsers);
+            //console.log(threadsUsers);
             //console.log(this.selected_user);
-            for( x in this.threadsUsers){
-                if( this.threadsUsers[x].user_id == this.selected_user){
-                    localStorage.setItem('current_thread', this.threadsUsers[x].thread_id);
+            for( x in threadsUsers){
+                //console.log(x);
+                //console.log(threadsUsers[x].user_id);
+                if( threadsUsers[x].user_id == this.selected_user){
+                    localStorage.setItem('current_thread', threadsUsers[x].thread_id);
                     break;
                 }
             }
@@ -771,28 +833,14 @@ let DMSusers = new Vue({
             });
             this.users = filtered;
         });
-        fetch("http://206.189.202.188:43554/threadsUsers.json", {
+        fetch("http://206.189.202.188:43554/threadsUsers/index/" + localStorage.getItem('user_id') + ".json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
         .then(response => response.json())
         .then((data) => {
             //console.log(data["Threads_Users"]);
-            var filtered = (data["Threads_Users"]).filter(function (entry) {
-                return JSON.stringify(entry.user_id) == localStorage.getItem('user_id');
-            });
-            //this.threadsUsers = filtered;
-            for( x in filtered){
-                var y = filtered[x].thread_id;
-                for( z in data["Threads_Users"]){
-                    if(y == data["Threads_Users"][z].thread_id){
-                        if(localStorage.getItem('user_id') != data["Threads_Users"][z].user_id) {
-                            this.threadsUsers.push(data["Threads_Users"][z]);
-                        }
-                    }
-                }
-            }
-            //console.log(this.threadsUsers);
+            threadsUsers = data["Threads_Users"];
         });
     },
     template: `
