@@ -249,6 +249,7 @@ let workspaces = new Vue({
         saveCurrentWorkspace(){
             localStorage.setItem('current_workspace', this.current_workspace);
             localStorage.setItem('current_thread', null)
+            message.updateMessageList();
         },
         joinWorkspace(joinWorkspaceID){
             fetch("http://206.189.202.188:43554/workspaceUsers/add.json", {
