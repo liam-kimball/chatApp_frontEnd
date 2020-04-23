@@ -239,10 +239,12 @@ let workspaces = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                //console.log(data);
+                console.log(data);
                 this.workspaces.push(data["Work Space"]);
-                
-            })             
+                localStorage.setItem('current_workspace', data["Work Space"].id);
+                this.joinWorkspace(data["Work Space"].id);   
+            })
+                    
         },
         saveCurrentWorkspace(){
             localStorage.setItem('current_workspace', this.current_workspace);
@@ -260,11 +262,12 @@ let workspaces = new Vue({
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + localStorage.getItem('token')
             }
-        })
-        .then(response => response.json())
-        .then((data) => {
-            //console.log(data.Workspaces);
-            this.workspaces = data.New_WorkSpace_User;
+            })
+            .then(response => response.json())
+            .then((data) => {
+                //console.log(data);
+                this.workspaces = data.New_WorkSpace_User;
+                localStorage.setItem('current_workspace', data.New_WorkSpace_User.workspace_id);
                 fetch("http://206.189.202.188:43554/workspaces/inWorkspace/"+ localStorage.getItem('user_id') +".json", {
                     method: "GET",    
                     headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
@@ -285,27 +288,30 @@ let workspaces = new Vue({
                 })
                 .then(response => response.json())
                 .then((data) => {
+                    console.log(data);
                     workspaceThread = data.Threads_in_Workspace;
                     console.log(workspaceThread);
-                    var filtered = (data.Threads_in_Workspace).filter(function (entry) {
-                        return JSON.stringify(entry.id) == localStorage.getItem('user_id');
-                    });
-                    fetch("http://206.189.202.188:43554/threadsUsers/add.json", {
-                    body: JSON.stringify({
-                        "user_id": localStorage.getItem('user_id'),
-                        //"thread_id" : ""
-                    }),
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + localStorage.getItem('token')
-                    },
-                })
-                .then(response => response.json())
-                .then((data) => {
-                   console.log(data);
-                 
-                });
+                    //var filtered = (data.Threads_in_Workspace).filter(function (entry) {
+                    //    return JSON.stringify(entry.id) == localStorage.getItem('user_id');
+                    //});
+                    for( x in workspaceThread){
+                        fetch("http://206.189.202.188:43554/threadsUsers/add.json", {
+                            body: JSON.stringify({
+                                "user_id": localStorage.getItem('user_id'),
+                                "thread_id" : workspaceThread[x].id,
+                            }),
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": "Bearer " + localStorage.getItem('token')
+                            },
+                        })
+                        .then(response => response.json())
+                        .then((data) => {
+                            console.log(data);
+                        });
+                    }
+                    threads.updateThreadsList();
             //////------------------------------------------------------------------------------
 
 
@@ -723,7 +729,7 @@ let message = new Vue({
             var data = JSON.parse(e.data);
             console.log(JSON.stringify(data));
             if(data.thread_id === localStorage.getItem('current_thread')){
-                if(data.from == "Me") {
+                if(data.from == localStorage.getItem('user_id')) {
                     document.getElementById("chats").innerHTML += '<div class="container bg-info p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + Date(data.created) + '</span></div>';
                 } else {
                     document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + Date(data.created)+ '</span></div>';
