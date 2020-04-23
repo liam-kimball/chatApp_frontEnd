@@ -1,3 +1,4 @@
+// --- Nave bar function ---
 let topnav = new Vue({
     el: "#topnav",
     data: {
@@ -7,6 +8,7 @@ let topnav = new Vue({
     },
 
     methods: {
+        //------ checks if there is a token ----
         updateUser() {
             this.token = localStorage.getItem('token');
         }
@@ -29,7 +31,7 @@ let topnav = new Vue({
     `
 });
 
-
+//---------------- Removes all the users information from local storage logging them out of the system -----------------
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('current_workspace');
@@ -50,8 +52,7 @@ let login = new Vue({
 
     methods: {
         login(username, password) {
-            //console.log(JSON.stringify({"username": username, "password": password}));
-            // add proxy url to allow calls from local system, will need to be taken out later
+            //------------ Allows the login information to be sent and being able to get the token to store it into local storage -----------------
             fetch("http://206.189.202.188:43554/users/login.json", {
                 body: JSON.stringify({
                     "username": username,
@@ -70,7 +71,7 @@ let login = new Vue({
                     this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
                 } catch(e) {
                     console.log('Cant find token');
-                    //localStorage.removeItem('token');
+                  
                 }
                 localStorage.setItem('user_id', this.user_id);
                 localStorage.setItem('username', this.username);
@@ -81,7 +82,7 @@ let login = new Vue({
     },
     mounted() {
 
-        
+        // -------- stores the user_id to local storage to be used later -----------
         if (localStorage.getItem('token')) {
             try {
                 this.token = localStorage.getItem('token');
@@ -89,7 +90,7 @@ let login = new Vue({
                 
             } catch(e) {
                 console.log('Cant find token');
-                //localStorage.removeItem('token');
+               
             }
             localStorage.setItem('user_id', this.user_id);
         }
@@ -130,7 +131,7 @@ let signUp = new Vue({
 
     methods: {
         signUp(first_name, last_name, username, email, password) {
-            // add proxy url to allow calls from local system, will need to be taken out later
+            // ------ Adds user to the User table in the data base -------------
             fetch("http://206.189.202.188:43554/users/add.json", {
                 body: JSON.stringify({
                     "first_name" : first_name,
@@ -153,7 +154,7 @@ let signUp = new Vue({
                     
                 } catch(e) {
                     console.log('Cant find token');
-                    //localStorage.removeItem('token');
+                   
                 }
                 location.replace("/channels.html")
             })
@@ -205,6 +206,7 @@ let workspaces = new Vue({
     },
     methods: {
         deleteWorkspace(id, i) {
+            // ------------- Deletes the work space by sending the workspce_id-----------------
             fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + id + ".json", {
                 method: "DELETE",
                 headers: {
@@ -216,6 +218,7 @@ let workspaces = new Vue({
             })
         },
         updateWorkspace(workspace) {
+            // --------- Updates the name of the workspaces sent ---------------
             fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + workspace.id + ".json", {
                 body: JSON.stringify(workspace),
                 method: "PUT",
@@ -229,6 +232,7 @@ let workspaces = new Vue({
             })
         },
         addWorkspace(name){
+            //-------------- Adds workspace to the workspace table with the name given --------------
             fetch("http://206.189.202.188:43554/workspaces/add.json", {
                 body: JSON.stringify({"name": name}),
                 method: "POST",
@@ -246,12 +250,15 @@ let workspaces = new Vue({
             })
                     
         },
+        // -------- saves the current workspace and current thread data to the local storage to up date the message list -------------
         saveCurrentWorkspace(){
             localStorage.setItem('current_workspace', this.current_workspace);
             localStorage.setItem('current_thread', null)
             message.updateMessageList();
         },
+        
         joinWorkspace(joinWorkspaceID){
+            // ----------Adds the user to the workspaceUser table----------------
             fetch("http://206.189.202.188:43554/workspaceUsers/add.json", {
             body: JSON.stringify({
                 "workspace_id" : joinWorkspaceID,
@@ -266,23 +273,23 @@ let workspaces = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                //console.log(data);
+              
                 this.workspaces = data.New_WorkSpace_User;
                 localStorage.setItem('current_workspace', data.New_WorkSpace_User.workspace_id);
+
+                // ---------Fetched all users that are in the same workspace as the User_id that is passed through---------------
                 fetch("http://206.189.202.188:43554/workspaces/inWorkspace/"+ localStorage.getItem('user_id') +".json", {
                     method: "GET",    
                     headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
                 })
                 .then(response => response.json())
                 .then((data) => {
-                    //console.log(data.Workspaces);
+                   
                     this.workspaces = data.Workspaces;
                     
                 });
 
-                ///----------- I was working on this feel free to delete it if you want i was trying to make it so when
-                /// ----------- you added the workspace it would iterate and add all the thread_User 
-
+                // ---------Fetched all threads from a specific WorkSpace------------------
                 fetch("http://206.189.202.188:43554/threads/inThread/"+ joinWorkspaceID +".json", {
                     method: "GET",    
                     headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
@@ -292,9 +299,7 @@ let workspaces = new Vue({
                     console.log(data);
                     workspaceThread = data.Threads_in_Workspace;
                     console.log(workspaceThread);
-                    //var filtered = (data.Threads_in_Workspace).filter(function (entry) {
-                    //    return JSON.stringify(entry.id) == localStorage.getItem('user_id');
-                    //});
+                   
                     for( x in workspaceThread){
                         fetch("http://206.189.202.188:43554/threadsUsers/add.json", {
                             body: JSON.stringify({
@@ -313,7 +318,6 @@ let workspaces = new Vue({
                         });
                     }
                     threads.updateThreadsList();
-            //////------------------------------------------------------------------------------
 
 
                 });
@@ -321,15 +325,17 @@ let workspaces = new Vue({
         }
     },
     mounted() {
+        //----------- sets current workspace and current thread to null -----
         localStorage.setItem('current_workspace', null);
-        localStorage.setItem('current_thread', null);
+        localStorage.setItem('current_thread', null); 
+
+        // ---------Fetched all users that are in the same workspace as the User_id that is passed through---------------
         fetch("http://206.189.202.188:43554/workspaces/inWorkspace/"+ localStorage.getItem('user_id') +".json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
         .then(response => response.json())
         .then((data) => {
-            //console.log(data.Workspaces);
             this.workspaces = data.Workspaces;
             
         });
@@ -420,6 +426,7 @@ let threads = new Vue({
     },
     methods: {
         deleteThread(id, i) {
+            //------------- Deletes the thread by thread id passsed through ------------------
             fetch("http://206.189.202.188:43554/threads/" + id + ".json", {
                 method: "DELETE"
             })
@@ -428,6 +435,7 @@ let threads = new Vue({
             })
         },
         updateThreads(thread) {
+            //------------- Updates the thread name for the thread_id that is passed throuhg ---------------
             fetch("http://206.189.202.188:43554/threads/" + thread.id + ".json", {
                 body: JSON.stringify(thread),
                 method: "PUT",
@@ -441,6 +449,7 @@ let threads = new Vue({
             })
         },
         addThread(name){
+            //-------------- adds thread to the thread table with the information given ----------
             fetch("http://206.189.202.188:43554/threads/add.json", {
                 body: JSON.stringify({
                     "name": name,
@@ -454,52 +463,56 @@ let threads = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                //console.log(data);
+              
                 this.threads.push(data["New Thread"]);
             })             
         },
         updateThreadsList(){
+            //------------------ updates the thread list to the threads that belong to the current workspace the user has selected -----------
             fetch("http://206.189.202.188:43554/threads.json", {
                 method: "GET",
                 headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
             })
             .then(response => response.json())
             .then((data) => {
-                //console.log(data.Threads);
+               
                 var filtered = (data.Threads).filter(function (entry) {
                     return JSON.stringify(entry.workspace_id) === localStorage.getItem('current_workspace');
                 });
-                //console.log(filtered);
+               
                 this.threads = filtered;
             })
         },
+        // -------------- saves the current thread a user has selected to send messages --------------------
         saveCurrentThread(){
             localStorage.setItem('current_thread', this.current_thread);
         }
     },
     mounted() {
+        //----------------- Fetches all the threads in the thread Table ---------------------
         fetch("http://206.189.202.188:43554/threads.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
         .then(response => response.json())
         .then((data) => {
-            //console.log(data.Threads);
+           
             var filtered = (data.Threads).filter(function (entry) {
                 if(localStorage.getItem('current_workspace') != "null"){
                     return JSON.stringify(entry.workspace_id) === localStorage.getItem('current_workspace');
                 }
             });
-            //console.log(filtered);
+           
             this.threads = filtered;
         })
+        // -------------- Fetches  all users that are in the same thread as the User_id that is passed through ---------------------
         fetch("http://206.189.202.188:43554/threadsUsers/index/" + localStorage.getItem('user_id') + ".json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
         .then(response => response.json())
         .then((data) => {
-            //console.log(data["Threads_Users"]);
+            
             threadsUsers = data["Threads_Users"];
         });
     },
@@ -572,6 +585,7 @@ let users = new Vue({
         users: [],
     },
     methods: {
+        //----------------- Deletes user  ----------
         deleteUser(id, i) {
             fetch("http://rest.learncode.academy/api/lkimball/workspace/" + id, {
                 method: "DELETE"
@@ -580,6 +594,7 @@ let users = new Vue({
                 this.threads.splice(i,1);
             })
         },
+        //------------- Updates users list for super Users ----------------------
         updateUser(user) {
             fetch("http://rest.learncode.academy/api/lkimball/thread/" + user.id, {
                 body: JSON.stringify(user),
@@ -594,6 +609,7 @@ let users = new Vue({
         },
     },
     mounted() {
+        //---------- Gets a list of all the users in the users table to be displyed for super users --------------------
         fetch("http://206.189.202.188:43554/users.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
@@ -637,19 +653,14 @@ let message = new Vue({
         //chats: chatStorage.fetch(),
         chats: [],
         addChatMessage: '',
-        conn: new WebSocket('ws://206.189.202.188:8080?token=' + localStorage.getItem('token')),
+        conn: new WebSocket('ws://206.189.202.188:8080?token=' + localStorage.getItem('token')), // ----- connects to websocket and send JWT token for validation of the client connecting ------
         newMessage: ''
     },
 
-    watch: {
-        //chats: {
-          //  handler: function(chats) {
-            //    chatStorage.save(chats);
-            //}
-        //}
-    },
+    
 
     methods: {
+        // --------- Adds message to the database and send it to the websocket to be sent to the needed users ------------------
         addChat(text){
             //const text = event.target.value
            //this.chats.push({text, done: false, id: Date.now()})
@@ -657,6 +668,7 @@ let message = new Vue({
             if(localStorage.getItem('current_thread') == "null"){
                 alert("Select a thread to send message to");
             } else {
+                //-------- Adds message to the databse ---------------
                 fetch("http://206.189.202.188:43554/messages/add.json", {
                     body: JSON.stringify({
                         "body": text,
@@ -674,8 +686,9 @@ let message = new Vue({
                     console.log(data);
                     this.token = localStorage.getItem('token');
                     this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
-                    //this.workspaces.push(data.Work_Space);
-                    //localStorage.setItem('user_id', data.user_id);
+                    
+
+        // -------- Sends message to websocket to be sent to the other connected clients that need to recieve this message -----------------
                     this.conn.send(JSON.stringify({
                         "body": text, 
                         "user_id": this.user_id, 
@@ -683,18 +696,16 @@ let message = new Vue({
                         "username": localStorage.getItem('username'),
                     }))
                 })  
-                //this.chats = ({message:this.text, id:this.user_id})
+                
                 this.addChatMessage = '';
                 this.newMessage = '';
             }
         },
 
-        removeChat(id) {
-            //this.chats = this.chats.filter(chat => chat.id !== id)
-        },
-
+        // ----------- updates the message list for the current chat ------------------
         updateMessageList() {
             document.getElementById('chats').innerHTML = '';
+        // ------------- fetches all the messages in thread_id passed -----------------------
             fetch("http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
                 method: "GET",
                 headers: { "Authorization": "Bearer " + localStorage.getItem('token') },
@@ -710,21 +721,27 @@ let message = new Vue({
 
     },
     mounted() {
+         // ------------- fetches all the messages in thread_id passed -----------------------
         fetch("http://206.189.202.188:43554/messages/index/" + localStorage.getItem('current_thread') + ".json", {
             method: "GET",
             headers: { "Authorization": "Bearer " + localStorage.getItem('token') },
         })
         .then(response => response.json())
         .then((data) => {
-            //console.log(data);
+           
             this.chats = data.Messages;     
         });
         var temp = document.getElementById('chatsWindow');
         temp.scrollTop = temp.scrollHeight;  
 
+
+
+        //-------------- Opens connection with the websocket so messages can be sent to it ------------------
         this.conn.onopen = function(e) {
             console.log("Connection established!");
         };
+
+        //--------------- Function recieves the message that was sent to the websocket to update the chat box ----------------
         this.conn.onmessage = function(e) {
             //console.log(e.data);
             var data = JSON.parse(e.data);
@@ -740,6 +757,8 @@ let message = new Vue({
             temp.scrollTop = temp.scrollHeight;          
             
         }
+
+        // -------------------- Closes connection with the websocket -----------------
         this.conn.onclose = function(e) {
             console.log("Connection Closed!");
         }
@@ -789,6 +808,8 @@ let DMSusers = new Vue({
         current_thread: '',
     },
     methods: {
+
+        //---------- Adds the thread for a Direct message if a thread doesnt exisit for that direct message -------------
         addThread(){
             fetch("http://206.189.202.188:43554/threads/add.json", {
                 body: JSON.stringify({
@@ -807,6 +828,8 @@ let DMSusers = new Vue({
                 //console.log(data["New Thread"].id);
                 localStorage.setItem('current_thread', data["New Thread"].id);
                 this.current_thread = data["New Thread"].id;
+
+            //------------------- Adds Person you are trying to Direct message to the thread table with the new thread_id ------------------------
                 fetch("http://206.189.202.188:43554/threadsUsers/add.json", {
                     body: JSON.stringify({
                         "thread_id": this.current_thread,
@@ -824,6 +847,7 @@ let DMSusers = new Vue({
                     threadsUsers.push(data["New Thread"]);
                     //console.log(this.threadsUsers)
                 });
+             //------------------- Adds Current user to Direct message to the thread table with the new thread_id  ------------------------
                 fetch("http://206.189.202.188:43554/threadsUsers/add.json", {
                     body: JSON.stringify({
                         "user_id": localStorage.getItem('user_id'),
@@ -843,29 +867,31 @@ let DMSusers = new Vue({
                 });
             });   
             
-        },    
+        }, 
+        // -------------- Saves the user you have selected to direct message and selects the thread_id -----------------   
         saveSelectedUser(){
             localStorage.setItem('current_thread', null);
-            //console.log(threadsUsers);
-            //console.log(this.selected_user);
+            
             for( x in threadsUsers){
-                //console.log(x);
-                //console.log(threadsUsers[x].user_id);
+    
                 if( threadsUsers[x].user_id == this.selected_user){
                     localStorage.setItem('current_thread', threadsUsers[x].thread_id);
                     break;
                 }
             }
             if(localStorage.getItem('current_thread') == "null"){
-                //console.log("adding a new thread");
+               
                 this.addThread();
             }
            
         },
     },
     mounted() {
+        // ------------------- Sets local storage item for current thread and current workspace to null ---------------------
         localStorage.setItem('current_workspace', null);
         localStorage.setItem('current_thread', null);
+
+        // -------------------------- Fetches all the Users in the table but only passes user_id and username ---------------------
         fetch("http://206.189.202.188:43554/users/indexs.json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
@@ -878,6 +904,8 @@ let DMSusers = new Vue({
             });
             this.users = filtered;
         });
+        
+        // -------------- Fetches all users that are in the same thread as the User_id that is passed through ------------------------------
         fetch("http://206.189.202.188:43554/threadsUsers/index/" + localStorage.getItem('user_id') + ".json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
