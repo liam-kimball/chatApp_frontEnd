@@ -19,14 +19,14 @@ let topnav = new Vue({
 
     template: `
     <div>
-    <a> <h6>ChatApp</h6></a>
-    <a v-if="localStorage.getItem('token') == null" href="index.html">Login</a>
-    <a v-if="localStorage.getItem('token') == null" href="signup.html">Signup</a>
-    <a  v-if="localStorage.getItem('token') != null" href="channels.html">Channel</a>
-    <a  v-if="localStorage.getItem('token') != null" href="users.html">Users</a>
-    <a  v-if="localStorage.getItem('token') != null" href="dms.html">Direct Messages</a>
-    <a v-if="localStorage.getItem('token') != null" onclick="logout()">Logout</a>
-  </div>
+        <a> <h6>ChatApp</h6></a>
+        <a v-if="localStorage.getItem('token') == null" href="index.html">Login</a>
+        <a v-if="localStorage.getItem('token') == null" href="signup.html">Signup</a>
+        <a  v-if="localStorage.getItem('token') != null" href="channels.html">Channel</a>
+        <!-- <a  v-if="localStorage.getItem('token') != null" href="users.html">Users</a> -->
+        <a  v-if="localStorage.getItem('token') != null" href="dms.html">Direct Messages</a>
+        <a v-if="localStorage.getItem('token') != null" onclick="logout()">Logout</a>
+    </div>
     
     `
 });
@@ -205,6 +205,9 @@ let workspaces = new Vue({
         workspaceThread:'',
     },
     methods: {
+        returnWorkspaces() {
+            return this.workspaces;
+        },
         deleteWorkspace(id, i) {
             // ------------- Deletes the work space by sending the workspce_id-----------------
             fetch("https://cors-anywhere.herokuapp.com/" + "http://206.189.202.188:43554/workspaces/" + id + ".json", {
@@ -356,12 +359,13 @@ let workspaces = new Vue({
                                 <button v-on:click="updateWorkspace(workspace)">save</button>
                             </div>
                             <div v-else>
+                                <b># {{workspace.id}}</b>
                                 <h6>{{workspace.name}}</h6>
                                 <template v-if="workspace.owner_user_id == localStorage.getItem('user_id')">
                                     <button v-on:click="editWorkspace = workspace.id">edit</button>
                                     <button v-on:click="deleteWorkspace(workspace.id, i)">X</button>
                                 </template>
-                            <!--<h5>id: {{workspace.id}}</h5>-->
+                            
                             <!--<p>owner_id: {{workspace.owner_user_id}}</p>-->
                             </div>
                         </div>
@@ -376,12 +380,13 @@ let workspaces = new Vue({
                                 <button v-on:click="updateWorkspace(workspace)">save</button>
                             </div>
                             <div v-else>
+                                <b># {{workspace.id}}</b>
                                 <h6>{{workspace.name}}</h6>
                                 <template v-if="workspace.owner_user_id == localStorage.getItem('user_id')">
                                     <button v-on:click="editWorkspace = workspace.id">edit</button>
                                     <button v-on:click="deleteWorkspace(workspace.id, i)">X</button>
                                 </template>
-                                <!--<h5>id: {{workspace.id}}</h5>-->
+                                
                                 <!--<p>owner_id: {{workspace.owner_user_id}}</p>-->
                             </div>
                         </div>
@@ -420,11 +425,15 @@ let threads = new Vue({
         title: 'Current threads',
         editThread: null,
         threads: [],
+        allThreads: [],
         newThread: '',
         current_thread: null,
         threadsUsers: [],
     },
     methods: {
+        returnAllThreads() {
+            return this.allThreads;
+        },
         deleteThread(id, i) {
             //------------- Deletes the thread by thread id passsed through ------------------
             fetch("http://206.189.202.188:43554/threads/" + id + ".json", {
@@ -496,7 +505,7 @@ let threads = new Vue({
         })
         .then(response => response.json())
         .then((data) => {
-           
+            this.allThreads = data.Threads
             var filtered = (data.Threads).filter(function (entry) {
                 if(localStorage.getItem('current_workspace') != "null"){
                     return JSON.stringify(entry.workspace_id) === localStorage.getItem('current_workspace');
@@ -654,7 +663,8 @@ let message = new Vue({
         chats: [],
         addChatMessage: '',
         conn: new WebSocket('ws://206.189.202.188:8080?token=' + localStorage.getItem('token')), // ----- connects to websocket and send JWT token for validation of the client connecting ------
-        newMessage: ''
+        newMessage: '',
+        unreadChat: [],
     },
 
     
@@ -717,7 +727,15 @@ let message = new Vue({
             });
             var temp = document.getElementById('chatsWindow');
             temp.scrollTop = temp.scrollHeight;  
-        }
+        },
+        unreadChat(arr, data){
+            for( x in arr){
+                if(arr[x].id == data.thread_id){
+                    this.unreadChat.push({'workspace_id': arr.workspace_id, 'thread_id': arr.id,})
+                }
+            }
+            console.log(unreadChat);
+        },
 
     },
     mounted() {
@@ -752,9 +770,31 @@ let message = new Vue({
                 } else {
                     document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + Date(data.created)+ '</span></div>';
                 }
+            } else {
+                //console.log(workspaces.returnWorkspaces());
+                //console.log(threads.returnAllThreads());
+                var wrkspc = workspaces.returnWorkspaces();
+                var thr = threads.returnAllThreads();
+                var arr = [];
+                for( x in wrkspc){
+                    for( y in thr){
+                        if(wrkspc[x].id == thr[y].workspace_id){
+                            arr.push(thr[y]);
+                        }
+                    }
+                }
+                var filtered = (arr).filter(function (entry) {
+                    return entry.id != localStorage.getItem('current_thread');
+                });
+                arr = filtered;
+                console.log(arr);
+                
+                message.unreadChat(arr, data);
+                
             }
+
             var temp = document.getElementById('chatsWindow');
-            temp.scrollTop = temp.scrollHeight;          
+            temp.scrollTop = temp.scrollHeight;
             
         }
 
