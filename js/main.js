@@ -1,35 +1,4 @@
-// --- Nave bar function ---
-let topnav = new Vue({
-    el: "#topnav",
-    data: {
-        username: '',
-        token: '',
-       
-    },
 
-    methods: {
-        //------ checks if there is a token ----
-        updateUser() {
-            this.token = localStorage.getItem('token');
-        }
-    },
-    mounted() {
-
-    },
-
-    template: `
-    <div>
-    <a> <h6>ChatApp</h6></a>
-    <a v-if="localStorage.getItem('token') == null" href="index.html">Login</a>
-    <a v-if="localStorage.getItem('token') == null" href="signup.html">Signup</a>
-    <a  v-if="localStorage.getItem('token') != null" href="channels.html">Channel</a>
-    <a  v-if="localStorage.getItem('token') != null" href="users.html">Users</a>
-    <a  v-if="localStorage.getItem('token') != null" href="dms.html">Direct Messages</a>
-    <a v-if="localStorage.getItem('token') != null" onclick="logout()">Logout</a>
-  </div>
-    
-    `
-});
 
 //---------------- Removes all the users information from local storage logging them out of the system -----------------
 function logout() {
@@ -41,156 +10,7 @@ function logout() {
     location.replace("/index.html")
 }
 
-let login = new Vue({
-    el: "#login",
-    data: {
-        username: '',
-        password: '',
-        token: '',
-        user_id: ''
-    },
 
-    methods: {
-        login(username, password) {
-            //------------ Allows the login information to be sent and being able to get the token to store it into local storage -----------------
-            fetch("http://206.189.202.188:43554/users/login.json", {
-                body: JSON.stringify({
-                    "username": username,
-                    "password": password
-                }),
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            })
-            .then(response => response.json())
-            .then((data) => {
-                localStorage.setItem('token', data.data.token);
-                try {
-                    this.token = localStorage.getItem('token');
-                    this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
-                } catch(e) {
-                    console.log('Cant find token');
-                  
-                }
-                localStorage.setItem('user_id', this.user_id);
-                localStorage.setItem('username', this.username);
-                location.replace("/channels.html")
-            })
-            
-        }
-    },
-    mounted() {
-
-        // -------- stores the user_id to local storage to be used later -----------
-        if (localStorage.getItem('token')) {
-            try {
-                this.token = localStorage.getItem('token');
-                this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
-                
-            } catch(e) {
-                console.log('Cant find token');
-               
-            }
-            localStorage.setItem('user_id', this.user_id);
-        }
-        else {
-            localStorage.setItem('user_id', null);
-        }
-    },
-
-    template: `
-      
-        <div id="loginbox">
-    <h1>ChatApp Login</h1>
-         <div class="form-group col-lg-9">
-         <input class="form-control" type="text" name="username" v-model="username" placeholder="Username" />
-         </div>
-        <div class="form-group col-lg-9">
-         <input class="form-control" type="password" name="password" v-model="password" placeholder="Password" v-on:keyup.enter="login(username, password)"/>
-        </div>
-        <div>
-    <div id="log-btndiv">
-    <button class="btn btn-outline-light btn-lg " type="button" v-on:click="login(username, password)" >Login</button>
-    </div>
-   </div>
-    `
-});
-
-let signUp = new Vue({
-    el: "#signUp",
-    data: {
-        first_name: '',
-        last_name: '',
-        username: '',
-        email: '',
-        password: '',
-        super_user: 0,
-        token: ''
-    },
-
-    methods: {
-        signUp(first_name, last_name, username, email, password) {
-            // ------ Adds user to the User table in the data base -------------
-            fetch("http://206.189.202.188:43554/users/add.json", {
-                body: JSON.stringify({
-                    "first_name" : first_name,
-                    "last_name" : last_name,
-                    "username" : username,
-                    "email" : email,
-                    "password" : password,
-                    "super_user": 0
-                }),
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            })
-            .then(response => response.json())
-            .then((data) => {
-                localStorage.setItem('token', data.data.token);
-                try {
-                    this.token = localStorage.getItem('token');
-                    
-                } catch(e) {
-                    console.log('Cant find token');
-                   
-                }
-                location.replace("/channels.html")
-            })
-            
-        }
-    },
-
-
-    template: `
-       
-        <div id="signUpbox">
-     <h1>ChatApp Sign Up</h1>
-        <div class="form-group col-lg-9">
-            <input class="form-control" type="text" name="first_name" v-model="first_name" placeholder="First name" />
-        </div>
-        <div class="form-group col-lg-9">
-            <input class="form-control" type="text" name="last_name" v-model="last_name" placeholder="Last name" />
-        </div>
-        <div class="form-group col-lg-9">
-            <input class="form-control" type="text" name="username" v-model="username" placeholder="Username" />
-        </div>
-        <div class="form-group col-lg-9">
-            <input class="form-control" type="text" name="email" v-model="email" placeholder="Email" />
-        </div>
-        <div class="form-group col-lg-9">
-            <input class="form-control" type="password" name="password" v-model="password" placeholder="Password" />
-        </div>
-        <div>
- <div id="log-btndiv">
- <button class="btn btn-outline-light btn-lg " type="button" v-on:click="signUp(first_name, last_name, username, email, password)">Create</button>
- </div>
-  </form>
-</div>
-    
-    `
-});
 
 let workspaces = new Vue({
     el: "#workspace",
@@ -253,7 +73,7 @@ let workspaces = new Vue({
         // -------- saves the current workspace and current thread data to the local storage to up date the message list -------------
         saveCurrentWorkspace(){
             localStorage.setItem('current_workspace', this.current_workspace);
-            localStorage.setItem('current_thread', null)
+            localStorage.setItem('current_thread', '')
             message.updateMessageList();
         },
         
@@ -326,8 +146,8 @@ let workspaces = new Vue({
     },
     mounted() {
         //----------- sets current workspace and current thread to null -----
-        localStorage.setItem('current_workspace', null);
-        localStorage.setItem('current_thread', null); 
+        localStorage.setItem('current_workspace', '');
+        localStorage.setItem('current_thread', ''); 
 
         // ---------Fetched all users that are in the same workspace as the User_id that is passed through---------------
         fetch("http://206.189.202.188:43554/workspaces/inWorkspace/"+ localStorage.getItem('user_id') +".json", {
@@ -577,73 +397,6 @@ let threads = new Vue({
     `
 });
 
-let users = new Vue({
-    el: "#users",
-    data: {
-        title: 'All users',
-        editUser: null,
-        users: [],
-    },
-    methods: {
-        //----------------- Deletes user  ----------
-        deleteUser(id, i) {
-            fetch("http://rest.learncode.academy/api/lkimball/workspace/" + id, {
-                method: "DELETE"
-            })
-            .then(() => {
-                this.threads.splice(i,1);
-            })
-        },
-        //------------- Updates users list for super Users ----------------------
-        updateUser(user) {
-            fetch("http://rest.learncode.academy/api/lkimball/thread/" + user.id, {
-                body: JSON.stringify(user),
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-            .then(() => {
-                this.editUser = null;
-            })
-        },
-    },
-    mounted() {
-        //---------- Gets a list of all the users in the users table to be displyed for super users --------------------
-        fetch("http://206.189.202.188:43554/users.json", {
-            method: "GET",    
-            headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
-        })
-        .then(response => response.json())
-        .then((data) => {
-            //console.log(data.users);
-            this.users = data.users;
-        })
-    },
-    template: `
-        <div class="container p-3 my-3 border">
-            <p>**admin only**</p>
-            <h4> Users: </h4>
-            <li v-for="user, i in users">
-                <div class="container p-3 my-3 border">
-                    <div v-if="editUser === user.id">
-                        <input v-on:keyup.enter="updateUser(user)" v-model="user.username" />
-                        <button v-on:click="updateUser(user)">save</button>
-                    
-                    </div>
-                    <div v-else>
-                        <!-- <button v-on:click="editUser = user.id">edit</button>
-                        <button v-on:click="deleteUser(user.id, i)">X</button> -->
-                        <h6>id: {{user.id}}</h6>
-                        <h4>username: {{user.username}}</h4>
-                        <h5>full name: {{user.first_name}} {{user.last_name}}</h5>
-                        <h5>email: {{user.email}}</h5>
-                    </div>
-                </div>
-            </li>
-        </div>
-    `
-});
 
 
 let message = new Vue({
