@@ -29,6 +29,11 @@ let signUp = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
+                if(data.message == "Failed")
+                {
+                    alert("User with that username or email already exsist");
+                }
+                else{
                 localStorage.setItem('token', data.data.token);
                 try {
                     this.token = localStorage.getItem('token');
@@ -38,6 +43,7 @@ let signUp = new Vue({
                    
                 }
                 location.replace("/channels.html")
+            }
             })
             
         }

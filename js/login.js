@@ -22,6 +22,11 @@ let login = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
+             if(data.message == "Invalid username or password")
+            {
+                alert("Invalid username or password");
+            }
+            else{
                 localStorage.setItem('token', data.data.token);
                 try {
                     this.token = localStorage.getItem('token');
@@ -33,6 +38,7 @@ let login = new Vue({
                 localStorage.setItem('user_id', this.user_id);
                 localStorage.setItem('username', this.username);
                 location.replace("/channels.html")
+            }
             })
             
         }
