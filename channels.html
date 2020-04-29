@@ -15,9 +15,10 @@
         <div id="topnav">
         </div>
       </div>
-
+      
       <div class="sidebar">
             <div id="workspace"></div>  
+            <button onclick="notifyMe()">Notify me!</button>
       </div>
       <body class="secondary">
         <div class="container-fluid p-3 my-3 text-white">
@@ -41,6 +42,23 @@
         <script src="js/vue.min.js"></script>
         <script src="js/nav.js"></script>
         <script src="js/main.js"></script>
-        
+        <script src="js/app.js"></script>
+        <script>function notifyMe() {
+
+         
+            if (Notification.permission === "granted") {
+           
+              var notification = new Notification("Welcome! we will notify you with notifications");
+            }
+          
+            else if (Notification.permission !== "denied") {
+              Notification.requestPermission().then(function (permission) {
+            
+                if (permission === "granted") {
+                  var notification = new Notification("Welcome! we will notify you with notifications");
+                }
+              });
+            }
+          }</script>
     </body>
 </html>

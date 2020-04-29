@@ -524,7 +524,6 @@ let message = new Vue({
                     this.token = localStorage.getItem('token');
                     this.user_id = JSON.parse(atob(this.token.split('.')[1])).sub;
                     
-
         // -------- Sends message to websocket to be sent to the other connected clients that need to recieve this message -----------------
                     this.conn.send(JSON.stringify({
                         "body": text, 
@@ -589,7 +588,16 @@ let message = new Vue({
                 } else {
                     document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + Date(data.created)+ '</span></div>';
                 }
+                
             }
+            if(data.from != localStorage.getItem('user_id')) {
+                if (Notification.permission === "granted") {
+                    
+                    var notification = new Notification(data.username + ( " (" + data.workspaceName + ", "+data.threadName + ") "),{
+                        body:data.body,
+                    });
+                  }
+                }
             var temp = document.getElementById('chatsWindow');
             temp.scrollTop = temp.scrollHeight;          
             
