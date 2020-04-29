@@ -19,7 +19,7 @@ let topnav = new Vue({
 
     template: `
     <div>
-    <a> <h6>ChatApp</h6></a>
+    <a><img  src="images/ChatApp.png"></a>
     <a v-if="localStorage.getItem('token') == null" href="index.html">Login</a>
     <a v-if="localStorage.getItem('token') == null" href="signup.html">Signup</a>
     <a  v-if="localStorage.getItem('token') != null" href="channels.html">Channel</a>

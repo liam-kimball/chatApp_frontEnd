@@ -8,16 +8,5 @@ self.addEventListener('activate', evt => {
 })
 
 self.addEventListener('push', (event) => {
-    if (event.data) {
-        const data = event.data;
-
-        const title = data.title;
-        const options = {
-            body: data.body,
-        };
-
-        event.waitUntil(
-            self.registration.showNotification(title, options),
-        );
-    }
+    
 });

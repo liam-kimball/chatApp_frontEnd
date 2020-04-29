@@ -158,6 +158,21 @@ let workspaces = new Vue({
         },
         
         joinWorkspace(joinWorkspaceID){
+            //------------- Validates if the workspace exisit or not --------------------------------
+            fetch("http://206.189.202.188:43554/workspaces/view/"+ joinWorkspaceID +".json", {
+                method: "GET",    
+                headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+            })
+            .then(response => response.json())
+            .then((data) => {
+                
+                if(data.message == "Record not found in table \"workspaces\"")
+                {
+                    alert("Invlaid Workspace ID");
+                }
+                    
+            });
+
             // ----------Adds the user to the workspaceUser table----------------
             fetch("http://206.189.202.188:43554/workspaceUsers/add.json", {
             body: JSON.stringify({
@@ -261,7 +276,7 @@ let workspaces = new Vue({
                                     <button v-on:click="editWorkspace = workspace.id">edit</button>
                                     <button v-on:click="deleteWorkspace(workspace.id, i)">X</button>
                                 </template>
-                            <!--<h5>id: {{workspace.id}}</h5>-->
+                            <h5>Invite ID: {{workspace.id}}</h5>
                             <!--<p>owner_id: {{workspace.owner_user_id}}</p>-->
                             </div>
                         </div>
@@ -590,12 +605,24 @@ let message = new Vue({
                 }
                 
             }
+            //-------------- Sends push notification only to people whoe need to see the notification ----
             if(data.from != localStorage.getItem('user_id')) {
                 if (Notification.permission === "granted") {
-                    
-                    var notification = new Notification(data.username + ( " (" + data.workspaceName + ", "+data.threadName + ") "),{
-                        body:data.body,
-                    });
+                    //------------ Push notification for a Direct message -----------
+                    if (data.workspaceName == null && data.threadName == null)
+                    {
+                        var notification = new Notification(data.username + ( " (Direct message) "),{
+                            body:data.body,
+                            icon: '/images/ChatApp.png'
+                        });
+                    }
+                    //------------- push notification for a thread -------------------------
+                    else{
+                        var notification = new Notification(data.username + ( " (" + data.workspaceName + ", "+data.threadName + ") "),{
+                            body:data.body,
+                            icon: '/images/ChatApp.png'
+                        });
+                    }
                   }
                 }
             var temp = document.getElementById('chatsWindow');
@@ -791,3 +818,5 @@ let DMSusers = new Vue({
         </div>
     `
 });
+
+
