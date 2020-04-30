@@ -246,11 +246,11 @@ let workspaces = new Vue({
     },
     template: `
         <div class="container p-3 mt-5">
-            <h4> Workspaces: </h4>
+            <h4> Workspaces </h4>
             <li v-for="workspace, i in workspaces" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
                 <template v-if="localStorage.getItem('current_workspace') == workspace.id">
                     <label class="btn btn-dark active">
-                        <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace(); threads.updateThreadsList();">
+                    <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace(); threads.updateThreadsList();  UsersIn.updateUsersList()">
                         <div class="container text-left">
                             <div v-if="editWorkspace === workspace.id">
                                 <input v-on:keyup.enter="updateWorkspace(workspace)" v-model="workspace.name" />
@@ -269,7 +269,7 @@ let workspaces = new Vue({
                 </template>
                 <template v-else>
                     <label class="btn btn-primary">
-                        <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace(); threads.updateThreadsList();">
+                    <input type="radio" id="{{ workspace.id }}" :value="workspace.id" v-model="current_workspace" v-on:change="saveCurrentWorkspace(); threads.updateThreadsList();  UsersIn.updateUsersList()">
                         <div class="container text-left">
                             <div v-if="editWorkspace === workspace.id">
                                 <input v-on:keyup.enter="updateWorkspace(workspace)" v-model="workspace.name" />
@@ -287,12 +287,12 @@ let workspaces = new Vue({
                 </template>
             </li>
             <div>
-                <h5>Join a Workspace:</h5>
+                <h5>Join a Workspace</h5>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="basic-addon1">#</span> 
                     </div>
-                    <input class="form-control" v-model="joinWorkspaceID" v-on:keyup.enter='joinWorkspace(joinWorkspaceID)'/>
+                    <input class="form-control" placeholder="Enter ID" v-model="joinWorkspaceID" v-on:keyup.enter='joinWorkspace(joinWorkspaceID)'/>
                     <div class="input-group-append">
                         <button class="btn btn-outline-dark" v-on:click="joinWorkspace(joinWorkspaceID)">Join</button>
                     </div>            
@@ -300,9 +300,9 @@ let workspaces = new Vue({
                 <small>enter a workspace ID #</small>
             </div><br><br>
             <div>
-                <h5>Create a new workspace:</h5>
+                <h5>Create a new workspace</h5>
                 <div class="input-group">
-                    <input class="form-control" v-model="newWorkspace" v-on:keyup.enter='addWorkspace(newWorkspace)'/>
+                    <input class="form-control" placeholder="Enter Name" v-model="newWorkspace" v-on:keyup.enter='addWorkspace(newWorkspace)'/>
                     <div class="input-group-append">
                         <button class="btn btn-outline-dark" v-on:click="addWorkspace(newWorkspace)">Add</button>
                     </div>            
@@ -419,7 +419,7 @@ let threads = new Vue({
     },
     template: `
         <div class="container p-3 my-3 border rounded">
-            <h4> Threads: </h4>
+            <h4> Threads </h4>
             <li v-for="thread, i in threads" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
                 <template v-if="localStorage.getItem('current_thread') == thread.id">
                     <label class="btn btn-light active">
@@ -438,9 +438,9 @@ let threads = new Vue({
                     </label>
                 </template>
             </li>
-            <h5>Create a new thread:</h5>
+            <h5>Create a new thread</h5>
             <div class="input-group">
-                <input class="form-control" v-model="newThread" v-on:keyup.enter='addThread(newThread)'/>
+                <input class="form-control" placeholder="New Thread Name" v-model="newThread" v-on:keyup.enter='addThread(newThread)'/>
                 <div class="input-group-append">
                     <button class="btn btn-outline-light" v-on:click="addThread(newThread)">Add</button>
                 </div>            
@@ -457,7 +457,7 @@ let message = new Vue({
         chats: [],
         addChatMessage: '',
         conn: new WebSocket('ws://206.189.202.188:8080?token=' + localStorage.getItem('token')), // ----- connects to websocket and send JWT token for validation of the client connecting ------
-        newMessage: ''
+        newMessage: '',
     },
 
     methods: {
@@ -550,6 +550,7 @@ let message = new Vue({
                     document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-2 my-1 rounded">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + Date(data.created)+ '</span></div>';
                 }
             }
+            
             //-------------- Sends push notification only to people whoe need to see the notification ----
             if(data.from != localStorage.getItem('user_id')) {
                 if (Notification.permission === "granted") {
@@ -580,7 +581,7 @@ let message = new Vue({
     },
     template: `
         <div class="container p-3 my-3 border rounded">
-            <h4> Messages: </h4>
+            <h4> Messages </h4>
             <div id="chatsWindow" class="overflow-auto border rounded p-1" style="height: 600px;">
                 <li v-for="chat, i in chats" style="list-style-type:none;">
                     <template v-if="chat.user_id == localStorage.getItem('user_id')">
@@ -601,7 +602,7 @@ let message = new Vue({
                 <div id="chats"></div>
             </div>
             <div class="input-group w-100 my-3">
-                <input class="form-control" v-model="newMessage" v-on:keyup.enter="addChat(newMessage)"/>
+                <textarea class="form-control" placeholder="Send A Message" v-model="newMessage" v-on:keyup.enter="addChat(newMessage)"></textarea>
                 <div class="input-group-append">
                     <button class="btn btn-outline-light" v-on:click="addChat(newMessage)">Send</button>
                 </div> 
@@ -743,6 +744,67 @@ let DMSusers = new Vue({
                         </div>
                     </label>
                 </template>
+            </li> 
+        </div>
+    `
+});
+
+let UsersIn = new Vue({
+    el: "#UsersIn",
+    data: {
+        title: 'Users in Workspace',
+        users: [],
+        current_user : localStorage.getItem('user_id')
+    },
+    methods: {
+
+        updateUsersList(){
+            //------------------ updates the thread list to the threads that belong to the current workspace the user has selected -----------
+            fetch("http://206.189.202.188:43554/workspaceUsers/UsersInWorkspace/"+ localStorage.getItem('current_workspace') +".json", {
+            method: "GET",    
+            headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+        })
+        .then(response => response.json())
+        .then((data) => {
+            var filtered = ( data.WorkSpace_Users).filter(function (entry) {
+                if(localStorage.getItem('current_workspace') != "null"){
+                    return JSON.stringify(entry.workspace_id) === localStorage.getItem('current_workspace');
+                }
+            });
+           
+            this.users = filtered;
+           
+        })
+        },
+     
+        
+    },
+    mounted() {
+
+      
+    
+   
+    },
+    template: `
+        <div class="container p-3 my-3 border">
+            <h4>{{ title }}</h4>
+            <li v-for="user, i in users" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
+            <template v-if="user.user_id == localStorage.getItem('user_id')">
+                    <label class="btn btn-info">
+                        <div class="container text-left">
+                            <h6>username: </h6><h4>{{user.username}}</h4>
+                           
+                        </div>
+                    </label>
+                    </template>
+                    <template v-else>
+                    <label class="btn btn-secondary">
+                    <div class="container text-left">
+                        <h6>username: </h6><h4>{{user.username}}</h4>
+                        
+                    </div>
+                </label>
+                    </template>
             </li> 
         </div>
     `

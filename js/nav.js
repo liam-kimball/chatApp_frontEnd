@@ -24,7 +24,7 @@ let topnav = new Vue({
         <a v-if="localStorage.getItem('token') == null" href="signup.html"><h4>Signup</h4></a>
         <a v-if="localStorage.getItem('token') != null" href="channels.html"><h3>Channels</h3></a>
         <a v-if="localStorage.getItem('token') != null" href="dms.html"><h3>Direct Messages</h3></a>
-        <a v-if="localStorage.getItem('token') != null" onclick="logout()"><h5>Logout</h5></a>
+        <a v-if="localStorage.getItem('token') != null" onclick="logout()"><h3>Logout</h3></a>
     </div>
     `
 });
