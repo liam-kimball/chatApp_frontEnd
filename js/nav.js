@@ -19,13 +19,12 @@ let topnav = new Vue({
 
     template: `
     <div>
-    <a><img  src="images/ChatApp.png"></a>
-    <a v-if="localStorage.getItem('token') == null" href="index.html">Login</a>
-    <a v-if="localStorage.getItem('token') == null" href="signup.html">Signup</a>
-    <a  v-if="localStorage.getItem('token') != null" href="channels.html">Channel</a>
-    <a  v-if="localStorage.getItem('token') != null" href="dms.html">Direct Messages</a>
-    <a v-if="localStorage.getItem('token') != null" onclick="logout()">Logout</a>
-  </div>
-    
+        <a class="mx-3"><img  src="images/ChatApp.png"></a>
+        <a v-if="localStorage.getItem('token') == null" href="index.html"><h4>Login</h4></a>
+        <a v-if="localStorage.getItem('token') == null" href="signup.html"><h4>Signup</h4></a>
+        <a v-if="localStorage.getItem('token') != null" href="channels.html"><h3>Channels</h3></a>
+        <a v-if="localStorage.getItem('token') != null" href="dms.html"><h3>Direct Messages</h3></a>
+        <a v-if="localStorage.getItem('token') != null" onclick="logout()"><h5>Logout</h5></a>
+    </div>
     `
 });

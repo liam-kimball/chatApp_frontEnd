@@ -1,5 +1,3 @@
-
-
 //---------------- Removes all the users information from local storage logging them out of the system -----------------
 function logout() {
     localStorage.removeItem('token');
@@ -9,7 +7,6 @@ function logout() {
     location.reload();
     location.replace("/index.html")
 }
-
 
 let signUp = new Vue({
     el: "#signUp",
@@ -57,41 +54,38 @@ let signUp = new Vue({
                 }
                 location.replace("/channels.html")
             }
-            })
-            
+            }) 
         }
     },
 
-
     template: `
-       
         <div id="signUpbox">
-     <h1>ChatApp Sign Up</h1>
-     <form>
-        <div class="form-group col-lg-9">
-            <input class="form-control" type="text" name="first_name" v-model="first_name" placeholder="First name" />
-        </div>
-        <div class="form-group col-lg-9">
-            <input class="form-control" type="text" name="last_name" v-model="last_name" placeholder="Last name" />
-        </div>
-        <div class="form-group col-lg-9">
-            <input class="form-control" type="text" name="username" v-model="username" placeholder="Username" />
-        </div>
-        <div class="form-group col-lg-9">
-            <input class="form-control" type="text" name="email" v-model="email" placeholder="Email" />
-        </div>
-        <div class="form-group col-lg-9">
-            <input class="form-control" type="password" name="password" v-model="password" placeholder="Password" />
-        </div>
-        <div>
- <div id="log-btndiv">
- <button class="btn btn-outline-light btn-lg " type="button" v-on:click="signUp(first_name, last_name, username, email, password)">Create</button>
- </div>
-  </form>
-</div>
-    
+        <h1>ChatApp Sign Up</h1>
+        <form>
+            <div class="form-group col-lg-9">
+                <input class="form-control" type="text" name="first_name" v-model="first_name" placeholder="First name" />
+            </div>
+            <div class="form-group col-lg-9">
+                <input class="form-control" type="text" name="last_name" v-model="last_name" placeholder="Last name" />
+            </div>
+            <div class="form-group col-lg-9">
+                <input class="form-control" type="text" name="username" v-model="username" placeholder="Username" />
+            </div>
+            <div class="form-group col-lg-9">
+                <input class="form-control" type="text" name="email" v-model="email" placeholder="Email" />
+            </div>
+            <div class="form-group col-lg-9">
+                <input class="form-control" type="password" name="password" v-model="password" placeholder="Password" />
+            </div>
+            <div>
+            <div id="log-btndiv">
+                <button class="btn btn-outline-light btn-lg " type="button" v-on:click="signUp(first_name, last_name, username, email, password)">Create</button>
+            </div>
+        </form>
+    </div>
     `
 });
+
 let workspaces = new Vue({
     el: "#workspace",
     data: {
@@ -169,8 +163,7 @@ let workspaces = new Vue({
                 if(data.message == "Record not found in table \"workspaces\"")
                 {
                     alert("Invlaid Workspace ID");
-                }
-                    
+                }  
             });
 
             // ----------Adds the user to the workspaceUser table----------------
@@ -198,10 +191,8 @@ let workspaces = new Vue({
                     headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
                 })
                 .then(response => response.json())
-                .then((data) => {
-                   
+                .then((data) => {  
                     this.workspaces = data.Workspaces;
-                    
                 });
 
                 // ---------Fetched all threads from a specific WorkSpace------------------
@@ -233,8 +224,6 @@ let workspaces = new Vue({
                         });
                     }
                     threads.updateThreadsList();
-
-
                 });
             })
         }
@@ -252,15 +241,12 @@ let workspaces = new Vue({
         .then(response => response.json())
         .then((data) => {
             this.workspaces = data.Workspaces;
-            
         });
-        
         
     },
     template: `
-        <div class="container p-3 my-3 border">
+        <div class="container p-3 mt-5">
             <h4> Workspaces: </h4>
-           <!--<h6> Current workspace: {{ current_workspace }}</h6>-->
             <li v-for="workspace, i in workspaces" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
                 <template v-if="localStorage.getItem('current_workspace') == workspace.id">
                     <label class="btn btn-dark active">
@@ -268,16 +254,15 @@ let workspaces = new Vue({
                         <div class="container text-left">
                             <div v-if="editWorkspace === workspace.id">
                                 <input v-on:keyup.enter="updateWorkspace(workspace)" v-model="workspace.name" />
-                                <button v-on:click="updateWorkspace(workspace)">save</button>
+                                <button class="btn btn-outline-light" v-on:click="updateWorkspace(workspace)">save</button>
                             </div>
                             <div v-else>
                                 <h6>{{workspace.name}}</h6>
                                 <template v-if="workspace.owner_user_id == localStorage.getItem('user_id')">
-                                    <button v-on:click="editWorkspace = workspace.id">edit</button>
-                                    <button v-on:click="deleteWorkspace(workspace.id, i)">X</button>
+                                    <button class="btn btn-outline-light" v-on:click="editWorkspace = workspace.id">edit</button>
+                                    <button class="btn btn-outline-light" v-on:click="deleteWorkspace(workspace.id, i)">X</button>
                                 </template>
                             <h5>Invite ID: {{workspace.id}}</h5>
-                            <!--<p>owner_id: {{workspace.owner_user_id}}</p>-->
                             </div>
                         </div>
                     </label>
@@ -288,16 +273,14 @@ let workspaces = new Vue({
                         <div class="container text-left">
                             <div v-if="editWorkspace === workspace.id">
                                 <input v-on:keyup.enter="updateWorkspace(workspace)" v-model="workspace.name" />
-                                <button v-on:click="updateWorkspace(workspace)">save</button>
+                                <button class="btn btn-outline-light" v-on:click="updateWorkspace(workspace)">save</button>
                             </div>
                             <div v-else>
                                 <h6>{{workspace.name}}</h6>
                                 <template v-if="workspace.owner_user_id == localStorage.getItem('user_id')">
-                                    <button v-on:click="editWorkspace = workspace.id">edit</button>
-                                    <button v-on:click="deleteWorkspace(workspace.id, i)">X</button>
+                                    <button class="btn btn-outline-light" v-on:click="editWorkspace = workspace.id">edit</button>
+                                    <button class="btn btn-outline-light" v-on:click="deleteWorkspace(workspace.id, i)">X</button>
                                 </template>
-                                <!--<h5>id: {{workspace.id}}</h5>-->
-                                <!--<p>owner_id: {{workspace.owner_user_id}}</p>-->
                             </div>
                         </div>
                     </label>
@@ -333,7 +316,6 @@ let threads = new Vue({
     el: "#thread",
     data: {
         title: 'Current threads',
-        editThread: null,
         threads: [],
         newThread: '',
         current_thread: null,
@@ -436,29 +418,14 @@ let threads = new Vue({
         });
     },
     template: `
-        <div class="container p-3 my-3 border">
+        <div class="container p-3 my-3 border rounded">
             <h4> Threads: </h4>
-          <!--  <h6> Current thread: {{ current_thread }}</h6> -->
             <li v-for="thread, i in threads" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
                 <template v-if="localStorage.getItem('current_thread') == thread.id">
                     <label class="btn btn-light active">
                         <input type="radio" id="{{ thread.id }}" :value="thread.id" v-model="current_thread" v-on:change="saveCurrentThread(); message.updateMessageList();">
-                        <div class="container text-left">
-                            <div v-if="editThread === thread.id">
-                                <input v-on:keyup.enter="updateThreads(thread)" v-model="thread.name" />
-                                <button v-on:click="updateThreads(thread)">save</button>
-                            
-                            </div>
-                            <div v-else>
-                                <h6>{{thread.name}}</h6>
-                                <!-- 
-                                <button v-on:click="editThread = thread.id">edit</button>
-                                <button v-on:click="deleteThread(thread.id, i)">X</button>
-                                -->
-                                
-                            <!--<h5>id: {{thread.id}}</h5>-->
-                                <!--<h6>workspace_id: {{ thread.workspace_id }}</h6>-->
-                            </div>
+                        <div class="container text-left">                            
+                             <h6>{{thread.name}}</h6>
                         </div>
                     </label>
                 </template>
@@ -466,21 +433,7 @@ let threads = new Vue({
                     <label class="btn btn-warning">
                         <input type="radio" id="{{ thread.id }}" :value="thread.id" v-model="current_thread" v-on:change="saveCurrentThread(); message.updateMessageList();">
                         <div class="container text-left">
-                            <div v-if="editThread === thread.id">
-                                <input v-on:keyup.enter="updateThreads(thread)" v-model="thread.name" />
-                                <button v-on:click="updateThreads(thread)">save</button>
-                            
-                            </div>
-                            <div v-else>
-                                <h6>{{thread.name}}</h6>
-                                <!-- 
-                                <button v-on:click="editThread = thread.id">edit</button>
-                                <button v-on:click="deleteThread(thread.id, i)">X</button>
-                                -->
-                                
-                            <!--<h5>id: {{thread.id}}</h5>-->
-                                <!--<h6>workspace_id: {{ thread.workspace_id }}</h6>-->
-                            </div>
+                            <h6>{{thread.name}}</h6>
                         </div>
                     </label>
                 </template>
@@ -496,8 +449,6 @@ let threads = new Vue({
     `
 });
 
-
-
 let message = new Vue({
     el: "#message",
     data: {
@@ -509,13 +460,11 @@ let message = new Vue({
         newMessage: ''
     },
 
-    
-
     methods: {
         // --------- Adds message to the database and send it to the websocket to be sent to the needed users ------------------
         addChat(text){
             //const text = event.target.value
-           //this.chats.push({text, done: false, id: Date.now()})
+            //this.chats.push({text, done: false, id: Date.now()})
             // event.target.value = ''
             if(localStorage.getItem('current_thread') == ''){
                 alert("Select a thread to send message to");
@@ -547,7 +496,6 @@ let message = new Vue({
                         "username": localStorage.getItem('username'),
                     }))
                 })  
-                
                 this.addChatMessage = '';
                 this.newMessage = '';
             }
@@ -585,8 +533,6 @@ let message = new Vue({
         var temp = document.getElementById('chatsWindow');
         temp.scrollTop = temp.scrollHeight;  
 
-
-
         //-------------- Opens connection with the websocket so messages can be sent to it ------------------
         this.conn.onopen = function(e) {
             console.log("Connection established!");
@@ -599,11 +545,10 @@ let message = new Vue({
             console.log(JSON.stringify(data));
             if(data.thread_id === localStorage.getItem('current_thread')){
                 if(data.from == localStorage.getItem('user_id')) {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + Date(data.created) + '</span></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-info p-2 my-1 rounded">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + Date(data.created) + '</span></div>';
                 } else {
-                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-2 my-1 border">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + Date(data.created)+ '</span></div>';
+                    document.getElementById("chats").innerHTML += '<div class="container bg-secondary p-2 my-1 rounded">' + '<h6>' + data.username + ':</h6><p>' + data.body + '</p><span class="time-right">' + Date(data.created)+ '</span></div>';
                 }
-                
             }
             //-------------- Sends push notification only to people whoe need to see the notification ----
             if(data.from != localStorage.getItem('user_id')) {
@@ -627,9 +572,7 @@ let message = new Vue({
                 }
             var temp = document.getElementById('chatsWindow');
             temp.scrollTop = temp.scrollHeight;          
-            
-        }
-
+            }
         // -------------------- Closes connection with the websocket -----------------
         this.conn.onclose = function(e) {
             console.log("Connection Closed!");
@@ -641,14 +584,14 @@ let message = new Vue({
             <div id="chatsWindow" class="overflow-auto border rounded p-1" style="height: 600px;">
                 <li v-for="chat, i in chats" style="list-style-type:none;">
                     <template v-if="chat.user_id == localStorage.getItem('user_id')">
-                        <div class="container bg-info p-2 my-1 border">
+                        <div class="container bg-info p-2 my-1 rounded">
                             <h6>{{chat.username}}:</h6>
                             <p>{{chat.body}}</p>
                             <span class="time-right">{{new Date(Date.parse(chat.created))}}</span>
                         </div>
                     </template>
                     <template v-else>
-                        <div class="container bg-secondary p-2 my-1 border">
+                        <div class="container bg-secondary p-2 my-1 rounded">
                             <h6>{{chat.username}}:</h6>
                             <p>{{chat.body}}</p>
                             <span class="time-right">{{new Date(Date.parse(chat.created))}}</span>
@@ -656,18 +599,16 @@ let message = new Vue({
                     </template>
                 </li>
                 <div id="chats"></div>
-                
             </div>
             <div class="input-group w-100 my-3">
                 <input class="form-control" v-model="newMessage" v-on:keyup.enter="addChat(newMessage)"/>
                 <div class="input-group-append">
                     <button class="btn btn-outline-light" v-on:click="addChat(newMessage)">Send</button>
                 </div> 
-
+            </div>
         </div>
     `
 });
-
 
 let DMSusers = new Vue({
     el: "#DMSusers",
@@ -680,7 +621,6 @@ let DMSusers = new Vue({
         current_thread: '',
     },
     methods: {
-
         //---------- Adds the thread for a Direct message if a thread doesnt exisit for that direct message -------------
         addThread(){
             fetch("http://206.189.202.188:43554/threads/add.json", {
@@ -733,9 +673,7 @@ let DMSusers = new Vue({
                 })
                 .then(response => response.json())
                 .then((data) => {
-                   //console.log(data);
                    threadsUsers.push(data["New Thread"]);
-                   //console.log(threadsUsers)
                 });
             });   
             
@@ -743,9 +681,7 @@ let DMSusers = new Vue({
         // -------------- Saves the user you have selected to direct message and selects the thread_id -----------------   
         saveSelectedUser(){
             localStorage.setItem('current_thread', '');
-            
             for( x in threadsUsers){
-    
                 if( threadsUsers[x].user_id == this.selected_user){
                     localStorage.setItem('current_thread', threadsUsers[x].thread_id);
                     break;
@@ -755,7 +691,6 @@ let DMSusers = new Vue({
                
                 this.addThread();
             }
-           
         },
     },
     mounted() {
@@ -770,7 +705,6 @@ let DMSusers = new Vue({
         })
         .then(response => response.json())
         .then((data) => {
-            //console.log(data.users);
             var filtered = (data.users).filter(function (entry) {
                 return JSON.stringify(entry.id) != localStorage.getItem('user_id');
             });
@@ -784,15 +718,12 @@ let DMSusers = new Vue({
         })
         .then(response => response.json())
         .then((data) => {
-            //console.log(data["Threads_Users"]);
             threadsUsers = data["Threads_Users"];
         });
     },
     template: `
         <div class="container p-3 my-3 border">
             <h4>{{ title }}</h4>
-           
-           
             <li v-for="user, i in users" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
                 <template v-if="selected_user == user.id">
                     <label class="btn btn-light active">
@@ -813,10 +744,6 @@ let DMSusers = new Vue({
                     </label>
                 </template>
             </li> 
-        
-               
         </div>
     `
 });
-
-
