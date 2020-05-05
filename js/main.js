@@ -245,7 +245,7 @@ let workspaces = new Vue({
         
     },
     template: `
-        <div class="container p-3 mt-5">
+        <div class="container">
             <h4> Workspaces </h4>
             <li v-for="workspace, i in workspaces" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
                 <template v-if="localStorage.getItem('current_workspace') == workspace.id">
@@ -440,7 +440,7 @@ let threads = new Vue({
             </li>
             <h5>Create a new thread</h5>
             <div class="input-group">
-                <input class="form-control" placeholder="New Thread Name" v-model="newThread" v-on:keyup.enter='addThread(newThread)'/>
+                <input class="form-control" placeholder="New Thread" v-model="newThread" v-on:keyup.enter='addThread(newThread)'/>
                 <div class="input-group-append">
                     <button class="btn btn-outline-light" v-on:click="addThread(newThread)">Add</button>
                 </div>            
@@ -602,7 +602,7 @@ let message = new Vue({
                 <div id="chats"></div>
             </div>
             <div class="input-group w-100 my-3">
-                <textarea class="form-control" placeholder="Send A Message" v-model="newMessage" v-on:keyup.enter="addChat(newMessage)"></textarea>
+                <input class="form-control" placeholder="Send A Message" v-model="newMessage" v-on:keyup.enter="addChat(newMessage)"/>
                 <div class="input-group-append">
                     <button class="btn btn-outline-light" v-on:click="addChat(newMessage)">Send</button>
                 </div> 
@@ -614,7 +614,7 @@ let message = new Vue({
 let DMSusers = new Vue({
     el: "#DMSusers",
     data: {
-        title: 'Current users',
+        title: 'Users',
         editUser: null,
         users: [],
         threadsUsers: [],
@@ -723,14 +723,14 @@ let DMSusers = new Vue({
         });
     },
     template: `
-        <div class="container p-3 my-3 border">
+        <div class="container">
             <h4>{{ title }}</h4>
             <li v-for="user, i in users" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
                 <template v-if="selected_user == user.id">
                     <label class="btn btn-light active">
                         <input type="radio" id="{{ user.id }}" :value="user.id" v-model="selected_user" v-on:change="saveSelectedUser(); message.updateMessageList();">
                         <div class="container text-left">
-                            <h6>username: </h6><h4>{{user.username}}</h4>
+                            <h6>username: </h6><h5>{{user.username}}</h5>
                             <h6>user_id: {{user.id}}</h6>
                         </div>
                     </label>
@@ -739,7 +739,7 @@ let DMSusers = new Vue({
                     <label class="btn btn-warning">
                         <input type="radio" id="{{ user.id }}" :value="user.id" v-model="selected_user" v-on:change="saveSelectedUser(); message.updateMessageList();">
                         <div class="container text-left">
-                            <h6>username: </h6><h4>{{user.username}}</h4>
+                            <h6>username: </h6><h5>{{user.username}}</h5>
                             <h6>user_id: {{user.id}}</h6>
                         </div>
                     </label>
@@ -752,7 +752,7 @@ let DMSusers = new Vue({
 let UsersIn = new Vue({
     el: "#UsersIn",
     data: {
-        title: 'Users in Workspace',
+        title: 'Users',
         users: [],
         current_user : localStorage.getItem('user_id')
     },
@@ -779,12 +779,6 @@ let UsersIn = new Vue({
      
         
     },
-    mounted() {
-
-      
-    
-   
-    },
     template: `
         <div class="container p-3 my-3 border">
             <h4>{{ title }}</h4>
@@ -806,6 +800,100 @@ let UsersIn = new Vue({
                 </label>
                     </template>
             </li> 
+        </div>
+    `
+});
+
+let Friends = new Vue({
+    el: "#Friends",
+    data: {
+        title: 'Add Friend',
+        current_user : localStorage.getItem('user_id'),
+        friendUsername : '',
+        friend_user_id : '',
+        flag : ''
+    },
+    methods: {
+
+        addFriend(name){
+            //-------- Validates if the username input exsist or not ------------
+            fetch("http://206.189.202.188:43554/users/view/"+ name +".json" ,{
+            method: "GET",    
+            headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+            })
+            .then(response => response.json())
+            .then((data) => {
+            if (data.user == null)
+            {
+               alert("User doesnt Exsist");
+            }
+            else{
+                //------ If username Exisit it check if the username is already in the friends list ----------------------
+                friend_user_id = data.user['0'].id;
+                fetch("http://206.189.202.188:43554/friends/view/"+ this.current_user +".json" ,{
+                method: "GET",    
+                headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+                })
+                .then(response => response.json())
+                .then((data) => {
+                     (data['friends list']).filter(function (entry) {
+                        console.log(JSON.stringify(entry.friend_username))
+                        console.log(JSON.stringify(name))
+                            if(JSON.stringify(entry.friend_username) === JSON.stringify(name))
+                            {
+                                
+                                alert("Already Friends With " + name);
+                                
+                            }
+                           
+                            
+                    });
+                    console.log(this.flag)
+                })
+                
+               // ----------------------If username isn't in the friends list it adds them in to the list ----------------------
+                fetch("http://206.189.202.188:43554/friends/add.json" ,{
+                    body: JSON.stringify({
+                        "friend_user_id" : friend_user_id,
+                        "user_id": this.current_user,
+                        "friend_username": name,
+                    }),
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + localStorage.getItem('token')
+                    },
+                })
+                .then(response => response.json())
+                .then((data) => {
+                    alert(name + " Has Been Added");
+           
+                })
+            
+            }
+
+            
+                
+               
+               
+            
+           
+            })
+        
+
+        },
+
+    },
+
+    template: `
+        <div class="container p-3 my-3 border">
+        <h5>{{ title }}</h5>
+        <div class="input-group">
+            <input class="form-control" placeholder="Enter Username" v-model="friendUsername" v-on:keyup.enter="addFriend(friendUsername)" />
+            <div class="input-group-append">
+                <button class="btn btn-outline-light"  v-on:click="addFriend(friendUsername)" >Add</button>
+            </div>            
+        </div>
         </div>
     `
 });
