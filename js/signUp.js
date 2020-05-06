@@ -29,20 +29,14 @@ let signUp = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                if(data.message == "Failed")
+                console.log(data.data.message)
+                if(data.data.message == "Failed")
                 {
-                    alert("User with that username or email already exsist");
+                    alert("An Error Occured please try again");
                 }
                 else{
-                localStorage.setItem('token', data.data.token);
-                try {
-                    this.token = localStorage.getItem('token');
-                    
-                } catch(e) {
-                    console.log('Cant find token');
-                   
-                }
-                location.replace("/channels.html")
+            
+                location.replace("/index.html")
             }
             })
             
@@ -67,7 +61,7 @@ let signUp = new Vue({
             <input class="form-control" type="text" name="email" v-model="email" placeholder="Email" />
         </div>
         <div class="form-group col-lg-9">
-            <input class="form-control" type="password" name="password" v-model="password" placeholder="Password" />
+            <input class="form-control" type="password" name="password" v-model="password" placeholder="Password" v-on:keyup.enter="login(username, password)" />
         </div>
         <div>
  <div id="log-btndiv">

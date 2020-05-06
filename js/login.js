@@ -75,6 +75,10 @@ let login = new Vue({
     <div id="log-btndiv">
     <button class="btn btn-outline-light btn-lg " type="button" v-on:click="login(username, password)" >Login</button>
     </div>
+    
+   </div>
+   <div>
+   <a href="forgotPassword.html" >Forgot Password?</a>
    </div>
     `
 });
