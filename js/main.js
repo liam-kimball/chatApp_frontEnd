@@ -622,63 +622,7 @@ let DMSusers = new Vue({
         current_thread: '',
     },
     methods: {
-        //---------- Adds the thread for a Direct message if a thread doesnt exisit for that direct message -------------
-        addThread(){
-            fetch("http://206.189.202.188:43554/threads/add.json", {
-                body: JSON.stringify({
-                    "name": '',
-                }),
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + localStorage.getItem('token')
-                },
-            })
-            .then(response => response.json())
-            .then((data) => {
-                console.log(data);
-                //this.threads.push(data["New Thread"]);
-                //console.log(data["New Thread"].id);
-                localStorage.setItem('current_thread', data["New Thread"].id);
-                this.current_thread = data["New Thread"].id;
-
-            //------------------- Adds Person you are trying to Direct message to the thread table with the new thread_id ------------------------
-                fetch("http://206.189.202.188:43554/threadsUsers/add.json", {
-                    body: JSON.stringify({
-                        "thread_id": this.current_thread,
-                        "user_id": this.selected_user,
-                    }),
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + localStorage.getItem('token')
-                    },
-                })
-                .then(response => response.json())
-                .then((data) => {
-                    console.log(data);
-                    threadsUsers.push(data["New Thread"]);
-                    //console.log(this.threadsUsers)
-                });
-             //------------------- Adds Current user to Direct message to the thread table with the new thread_id  ------------------------
-                fetch("http://206.189.202.188:43554/threadsUsers/add.json", {
-                    body: JSON.stringify({
-                        "user_id": localStorage.getItem('user_id'),
-                        "thread_id": this.current_thread,
-                    }),
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + localStorage.getItem('token')
-                    },
-                })
-                .then(response => response.json())
-                .then((data) => {
-                   threadsUsers.push(data["New Thread"]);
-                });
-            });   
-            
-        }, 
+      
         // -------------- Saves the user you have selected to direct message and selects the thread_id -----------------   
         saveSelectedUser(){
             localStorage.setItem('current_thread', '');
@@ -688,10 +632,7 @@ let DMSusers = new Vue({
                     break;
                 }
             }
-            if(localStorage.getItem('current_thread') == "null"){
-               
-                this.addThread();
-            }
+           
         },
     },
     mounted() {
@@ -700,14 +641,14 @@ let DMSusers = new Vue({
         localStorage.setItem('current_thread', '');
 
         // -------------------------- Fetches all the Users in the table but only passes user_id and username ---------------------
-        fetch("http://206.189.202.188:43554/users/indexs.json", {
+        fetch("http://206.189.202.188:43554/friends/view/"+ localStorage.getItem('user_id') +".json", {
             method: "GET",    
             headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
         })
         .then(response => response.json())
         .then((data) => {
-            var filtered = (data.users).filter(function (entry) {
-                return JSON.stringify(entry.id) != localStorage.getItem('user_id');
+            var filtered = (data['friends list']).filter(function (entry) {
+                return JSON.stringify(entry.user_id) == localStorage.getItem('user_id');
             });
             this.users = filtered;
         });
@@ -726,21 +667,21 @@ let DMSusers = new Vue({
         <div class="container">
             <h4>{{ title }}</h4>
             <li v-for="user, i in users" class="list-unstyled btn-group btn-group-toggle btn-block my-1">
-                <template v-if="selected_user == user.id">
+                <template v-if="selected_user == user.friend_user_id">
                     <label class="btn btn-light active">
-                        <input type="radio" id="{{ user.id }}" :value="user.id" v-model="selected_user" v-on:change="saveSelectedUser(); message.updateMessageList();">
+                        <input type="radio" id="{{ user.friend_user_id }}" :value="user.friend_user_id" v-model="selected_user" v-on:change="saveSelectedUser(); message.updateMessageList();">
                         <div class="container text-left">
-                            <h6>username: </h6><h5>{{user.username}}</h5>
-                            <h6>user_id: {{user.id}}</h6>
+                            <h6>username: </h6><h5>{{user.friend_username}}</h5>
+                            <!--- <h6>user_id: {{user.friend_user_id}}</h6> -->
                         </div>
                     </label>
                 </template>
                 <template v-else>
                     <label class="btn btn-warning">
-                        <input type="radio" id="{{ user.id }}" :value="user.id" v-model="selected_user" v-on:change="saveSelectedUser(); message.updateMessageList();">
+                        <input type="radio" id="{{ user.friend_user_id }}" :value="user.friend_user_id" v-model="selected_user" v-on:change="saveSelectedUser(); message.updateMessageList();">
                         <div class="container text-left">
-                            <h6>username: </h6><h5>{{user.username}}</h5>
-                            <h6>user_id: {{user.id}}</h6>
+                            <h6>username: </h6><h5>{{user.friend_username}}</h5>
+                           <!--- <h6>user_id: {{user.friend_user_id}}</h6> -->
                         </div>
                     </label>
                 </template>
@@ -755,6 +696,7 @@ let UsersIn = new Vue({
         title: 'Users',
         users: [],
         current_user : localStorage.getItem('user_id')
+        
     },
     methods: {
 
@@ -811,7 +753,9 @@ let Friends = new Vue({
         current_user : localStorage.getItem('user_id'),
         friendUsername : '',
         friend_user_id : '',
-        flag : ''
+        current_thread: '',
+        threadsUsers: [],
+        
     },
     methods: {
 
@@ -829,7 +773,7 @@ let Friends = new Vue({
             }
             else{
                 //------ If username Exisit it check if the username is already in the friends list ----------------------
-                friend_user_id = data.user['0'].id;
+                this.friend_user_id = data.user['0'].id;
                 fetch("http://206.189.202.188:43554/friends/view/"+ this.current_user +".json" ,{
                 method: "GET",    
                 headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
@@ -845,18 +789,63 @@ let Friends = new Vue({
                                 alert("Already Friends With " + name);
                                 
                             }
-                           
                             
                     });
-                    console.log(this.flag)
+                   
+                   // ----------------------If username isn't in the friends list it adds them in to the list ----------------------
+                    fetch("http://206.189.202.188:43554/friends/add.json" ,{
+                        body: JSON.stringify({
+                            "friend_user_id" : this.friend_user_id,
+                            "user_id": localStorage.getItem('user_id'),
+                            "friend_username": name,
+                        }),
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + localStorage.getItem('token')
+                        },
+                    })
+                    .then(response => response.json())
+                    .then((data) => {
+                        alert(name + " Has Been Added");
+                        this.addThread();
+                    })
+                    
                 })
                 
-               // ----------------------If username isn't in the friends list it adds them in to the list ----------------------
-                fetch("http://206.189.202.188:43554/friends/add.json" ,{
+            }
+
+            
+            })
+
+
+        },
+
+        // --------------------- Adds the new thread between the two friends into the thread tabel so they have a DM chat --------------------------------
+        addThread(){
+            fetch("http://206.189.202.188:43554/threads/add.json", {
+                body: JSON.stringify({
+                    "name": '',
+                }),
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem('token')
+                },
+            })
+            .then(response => response.json())
+            .then((data) => {
+                console.log(data);
+                //this.threads.push(data["New Thread"]);
+                //console.log(data["New Thread"].id);
+                localStorage.setItem('current_thread', data["New Thread"].id);
+                this.current_thread = data["New Thread"].id;
+
+            //------------------- Adds Person you are trying to Direct message to the thread table with the new thread_id ------------------------
+                fetch("http://206.189.202.188:43554/threadsUsers/add.json", {
                     body: JSON.stringify({
-                        "friend_user_id" : friend_user_id,
-                        "user_id": this.current_user,
-                        "friend_username": name,
+                        "thread_id": this.current_thread,
+                        "user_id": this.friend_user_id,
                     }),
                     method: "POST",
                     headers: {
@@ -866,22 +855,30 @@ let Friends = new Vue({
                 })
                 .then(response => response.json())
                 .then((data) => {
-                    alert(name + " Has Been Added");
-           
+                    console.log(data);
+                    threadsUsers.push(data["New Thread"]);
+                    //console.log(this.threadsUsers)
+                });
+             //------------------- Adds Current user to Direct message to the thread table with the new thread_id  ------------------------
+                fetch("http://206.189.202.188:43554/threadsUsers/add.json", {
+                    body: JSON.stringify({
+                        "user_id": localStorage.getItem('user_id'),
+                        "thread_id": this.current_thread,
+                    }),
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + localStorage.getItem('token')
+                    },
                 })
+                .then(response => response.json())
+                .then((data) => {
+                   threadsUsers.push(data["New Thread"]);
+                });
+            });   
             
-            }
-
-            
-                
-               
-               
-            
-           
-            })
-        
-
-        },
+        }, 
+      
 
     },
 
