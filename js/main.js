@@ -622,7 +622,21 @@ let DMSusers = new Vue({
         current_thread: '',
     },
     methods: {
-      
+        updateFriends() {
+           
+        // ------------- fetches friends list for the user_id passed -----------------------
+        fetch("http://206.189.202.188:43554/friends/view/"+ localStorage.getItem('user_id') +".json", {
+            method: "GET",    
+            headers: {"Authorization": "Bearer " + localStorage.getItem('token')}
+        })
+        .then(response => response.json())
+        .then((data) => {
+            var filtered = (data['friends list']).filter(function (entry) {
+                return JSON.stringify(entry.user_id) == localStorage.getItem('user_id');
+            });
+            this.users = filtered;
+        });
+        },
         // -------------- Saves the user you have selected to direct message and selects the thread_id -----------------   
         saveSelectedUser(){
             localStorage.setItem('current_thread', '');
@@ -781,8 +795,8 @@ let Friends = new Vue({
                 .then(response => response.json())
                 .then((data) => {
                      (data['friends list']).filter(function (entry) {
-                        console.log(JSON.stringify(entry.friend_username))
-                        console.log(JSON.stringify(name))
+                        //console.log(JSON.stringify(entry.friend_username))
+                        //console.log(JSON.stringify(name))
                             if(JSON.stringify(entry.friend_username) === JSON.stringify(name))
                             {
                                 
@@ -809,6 +823,7 @@ let Friends = new Vue({
                     .then((data) => {
                         alert(name + " Has Been Added");
                         this.addThread();
+                        DMSusers.updateFriends();
                     })
                     
                 })
@@ -835,7 +850,7 @@ let Friends = new Vue({
             })
             .then(response => response.json())
             .then((data) => {
-                console.log(data);
+                //console.log(data);
                 //this.threads.push(data["New Thread"]);
                 //console.log(data["New Thread"].id);
                 localStorage.setItem('current_thread', data["New Thread"].id);
@@ -855,7 +870,7 @@ let Friends = new Vue({
                 })
                 .then(response => response.json())
                 .then((data) => {
-                    console.log(data);
+                    //console.log(data);
                     threadsUsers.push(data["New Thread"]);
                     //console.log(this.threadsUsers)
                 });
