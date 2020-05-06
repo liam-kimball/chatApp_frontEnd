@@ -1,14 +1,14 @@
-div.token{
+  div.token{
   font-size: 2px;
   color: #4CAF50;
-}
+  }
 
-div.bottons {
+  div.bottons {
   background-color: #4CAF50;
   color: white;
-}
+  }
 
-h1.welcome {
+    h1.welcome {
     text-align: center;
     padding: 10px;
     color: white;
@@ -26,32 +26,6 @@ h1.welcome {
     border-radius: 2px;
   }
   
-  .nav-bar {
-    
-    height: 60px;
-    margin-bottom: 30px;
-    font-family: monospace;
-  }
-  
-  #chatApp {
-    margin-left: 200px;
-
-    border-radius: 3px;
-    padding: 20px;
-    transition: all 0.2s;
-  }
-  
-  li {
-    margin: 10px 0;
-    font-family: monospace;
-    font-size: 12pt;
-    padding: 10px;
-    border: solid;
-    border-color: black;
-    border-radius: 1px;
-  }
-  
- 
   
   .xbutton {
     font-size: 10px;
@@ -110,23 +84,37 @@ h1.welcome {
     
   
   /* side nav bar */
-  
+  .workspace-btn {
+    width: 200px;
+  }
+
   .space {
       flex-grow: 1;
     }
   
     .sidebar {
-        width: 200px;
-        background-color: #f1f1f1;
+        width: 215px;
+        background-color: #f2f2f2;
         position: fixed;
         height: 100%;
         z-index: 1;
         top: 0;
         left: 0;
+        float: right;
         overflow-x: hidden;
         padding-top: 20px;
       }
-      
+     
+      .rightSidebar {
+        width: 200px;
+       background-color:  rgb(40, 45, 51);
+        color: white;
+        height: 100%;
+        float: right;
+        overflow-x: hidden;
+        position: initial;
+        padding-top: 32px;
+      }
       .sidebar a {
         display: block;
         color: black;
@@ -208,12 +196,16 @@ h1.welcome {
       .mains {
         margin-left: 165px;
     }
-
+    .secondary{
+      margin-left: 165px;
+      background-color:  rgb(40, 45, 51);
+      ;
+  }
       .bg-secondary{
           margin-left: 165px;
           background-color: white;
       }
-
+      
       .body{
         margin-left: 165px;
     }
@@ -243,9 +235,8 @@ h1.welcome {
       
       .time-right {
         float: right;
-        color: #aaa;
+        color: rgb(247, 240, 240);
       }
-      
       
   /* .sidenav {
     height: 100%;

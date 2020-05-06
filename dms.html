@@ -12,28 +12,31 @@
     </head>
 
     <div class="topnav">
-        <a> <h6>ChatApp</h6></a>
-        <a href="index.html">Login</a>
-        <a href="signup.html">Signup</a>
-        <a href="channels.html">Channel</a>
-        <a href="users.html">Users</a>
-        <a class="active" href="dms.html">Direct Messages</a>
-        <a onclick="logout()">Logout</a>
+        <div id="topnav">
+        </div>
       </div>
 
-     
-    <body class="bg-secondary">
+      <div class="sidebar">
+            <div id="DMSusers"></div>
+        </div>
+
+    
+
+    <body class="secondary">
         <div class="container-fluid p-3 my-3 text-white">
             <div id="id01" class="container">
-                <h1 class="center" >ChatApp</h1>
                 
                 
-            
-            
-                
-                <div class="col-lg-8">
-                    <div id="message"></div>
-                    <div id="chats"></div>
+                <div class="row">
+                 
+                    <div class="col-lg-8">
+                        <div id="message"></div>
+                    
+                    </div>  
+                    <div class="col-lg-3">
+                    <div id="Friends" ></div>
+                    </div>
+                </div>
                             
             </div>
             
@@ -43,5 +46,7 @@
 
         <script src="js/vue.min.js"></script>
         <script src="js/main.js"></script>
+        <script src="js/nav.js"></script>
+        <script src="js/app.js"></script>
     </body>
 </html>
