@@ -7,7 +7,7 @@ let forgotPassword = new Vue({
 
     methods: {
         forgotPassword(email) {
-            //------------ Allows the login information to be sent and being able to get the token to store it into local storage -----------------
+            //------------ Allows us to send the User an email to the given email address -----------------
             fetch("http://206.189.202.188:43554/users/forgotPassword/"+ email +".json", {
                 body: JSON.stringify({
                    
